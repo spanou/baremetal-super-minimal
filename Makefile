@@ -1,7 +1,7 @@
 
-ASM_SRCS= $(wildcard *.s)
+ASM_SRCS= $(wildcard src/*.s)
 ASM_OBJS= $(subst .s,.o,$(ASM_SRCS))
-C_SRCS= $(wildcard *.c)
+C_SRCS= $(wildcard src/*.c)
 C_OBJS= $(subst .c,.o,$(C_SRCS))
 OBJS= $(C_OBJS) $(ASM_OBJS)
 SRCS= $(ASM_SRCS) $(C_SRCS)
@@ -16,12 +16,12 @@ QEMU_BASE=
 QEMU_BIN= $(QEMU_BASE)qemu-system-arm
 TARGET= startup
 TARGET_ELF= $(TARGET).elf
-GNU_ASM_FLAGS= -g
+GNU_ASM_FLAGS= -g -I./src -I./include
 
 #
 # TODO: Need to set up the right flags for the gcc compiler
 #
-GNU_GCC_FLAGS= -g -mthumb -mcpu=cortex-m4 -nostdlib -nostartfiles -ffreestanding -c
+GNU_GCC_FLAGS= -g -I./src -I./include -mthumb -mcpu=cortex-m4 -nostdlib -nostartfiles -ffreestanding -c
 
 %.o: %.c
 	$(GNU_ARM_GCC) $(GNU_GCC_FLAGS) $< -o $@
