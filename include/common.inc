@@ -1,14 +1,14 @@
 /**
  *
- * This file contains common defines that will be preprocessed to auto generate 
- * a consts.s and consts.c. 
- * 
+ * This file contains common defines that will be preprocessed to auto generate
+ * a consts.s and consts.c.
+ *
  * The format of a define is <name>, <value> where value can be either
- * hexadecimal or decimal. 
+ * hexadecimal or decimal.
  */
 
 /**
- * 
+ *
  * --- MEMORY MONITOR ---
  *
  */

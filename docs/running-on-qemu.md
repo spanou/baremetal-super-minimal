@@ -6,25 +6,9 @@ __Date:__ Sat 25 Sep 2021
 
 __Markdown Rules:__ [here](https://www.markdownguide.org/basic-syntax/)
 
-***
-
-To run the asm bin on qemu execute the following line from the QEMU container.
-
-To bring up the QEMU container environment do the following:
-```bash
-development/containers/prj-qemu/qemu-dev.sh -r
-cd development/sam4-xplainpro/bluepin_asm
-```
-
-To run the asm from the command line do:
-
-```bash
-./arm-softmmu/qemu-system-arm -M netduinoplus2 -display none  -serial none -serial none -serial mon:stdio  -kernel ../../../sam4-xplainpro/bluepin_asm/startup.bin
-```
-Once in QEMU -> Press ```Control-A + C``` to go to the monitor.
-
-Once in the monitor execute ```x /128cb 0x20001000```  to view the content of the memory monitor
-
+ARM ASM Tutorial
+[here](https://www.mikrocontroller.net/articles/ARM-ASM-Tutorial)
+A PDF of the page above can be found [here](./ARM-ASM-Tutorial.pdf)
 ***
 
 ## Debuggging with the Makefile
@@ -39,6 +23,19 @@ is due to the ```.gdbinit``` which is getting loaded when the call to the gdb-mu
 add-auto-load-safe-path /home/spanou/development/sam4-xplainpro/bluepin_asm/.gdbinit
 set architecture arm
 target remote localhost:1234
+```
+
+### Make sure you kill QEMU after you done debugging
+```
+  spanou@qemu-m4:~/development/c/baremetal-super-minimal$ ps -a
+  PID TTY          TIME CMD
+  329 pts/0    00:00:00 qemu-system-arm
+  332 pts/0    00:00:00 ps
+spanou@qemu-m4:~/development/c/baremetal-super-minimal$ kill -9 329
+spanou@qemu-m4:~/development/c/baremetal-super-minimal$ ps -a
+  PID TTY          TIME CMD
+  333 pts/0    00:00:00 ps
+spanou@qemu-m4:~/development/c/baremetal-super-minimal$ 
 ```
 ***
 
@@ -76,13 +73,10 @@ From the gdb prompt type:
 
 The output should be something like what's shown in the _figure 1_ below.
 
-![Layout with Src and Regs](../docs/layout_src_regs.png)
+![Layout with Src and Regs](./layout_src_regs-simple.png)
 
 _figure 1_ - gdb layout example
 
 
 ***
-
-## Article on Sharing Consts between ASM and C
-[here](https://www.microchip.com/forums/m249596.aspx)
 

@@ -1,9 +1,9 @@
 #
-# Vector Table 
+# Vector Table
 #
 .syntax unified
 .cpu cortex-m4
-.thumb 
+.thumb
 
 
 .section ._vectorTable, "a"
