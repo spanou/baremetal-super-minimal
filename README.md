@@ -4,7 +4,7 @@ This is an example of a very simple baremetal ASM (can add C as needed) applicat
 
 
 ## Step 1 - Download and Run the docker image 
-A quick introduciton on how to download and launch the docker image can be found  [here](https://hub.docker.com/r/spanou/qemu-m4). This is your first step before doing anything else.
+A quick introduction on how to download and launch the docker image can be found  [here](https://hub.docker.com/r/spanou/qemu-m4). You must complete this step before doing anything else.
 
 ## Step 2 - Clone and Build this example
 
