@@ -2,8 +2,6 @@
 
 __Author:__ Sakis Panou <sakis.panou@gmail.com>
 
-__Date:__ Sat 25 Sep 2021
-
 __Markdown Rules:__ [here](https://www.markdownguide.org/basic-syntax/)
 
 ARM ASM Tutorial
