@@ -4,9 +4,9 @@ __Author:__ Sakis Panou <sakis.panou@gmail.com>
 
 __Markdown Rules:__ [here](https://www.markdownguide.org/basic-syntax/)
 
-ARM ASM Tutorial
-[here](https://www.mikrocontroller.net/articles/ARM-ASM-Tutorial)
-A PDF of the page above can be found [here](./ARM-ASM-Tutorial.pdf)
+### ARM ASM Tutorial
+- There is a very comprehensive page on ASM for ARM [here](https://www.mikrocontroller.net/articles/ARM-ASM-Tutorial)
+- A PDF of the page above can be found [here](./ARM-ASM-Tutorial.pdf)
 ***
 
 ## Debuggging with the Makefile
