@@ -15,6 +15,23 @@ __Markdown Rules:__ [here](https://www.markdownguide.org/basic-syntax/)
 make run
 gdb-multiarch startup.elf
 ```
+
+If we were to look inside the Makefile you will find the following command: 
+```
+qemu-system-arm -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio  -kernel startup.bin &
+```
+Let's break this down a bit to see what all those options mean:
+
+```
+    * `-M netduinoplus2` selects the netduinoplus2 board
+    * `-display none` specifies there is not visual display
+    * `-S` Stops the QEMU at start waiting for a debugger to be attached.
+    * `-s` Specifies the debug server to listen to localhost:1234
+    * `-serial none` specifies there is no serial port 
+    * `-serial mon:stdio` put the monitor in the standard output
+    * `-kernel` specifies which image to select to start from
+
+```
 **Note**: One of the reasons you don't need to specify the remote target when loading
 is due to the ```.gdbinit``` which is getting loaded when the call to the gdb-multiarch is made. The content of the .gdbinit are as follows:
 ```
