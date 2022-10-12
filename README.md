@@ -18,5 +18,7 @@ cd baremetal-super-minimal
 make all 
 ```
 
-For more information about this simple baremetal ASM example click [here](https://github.com/spanou/baremetal-super-minimal/blob/main/docs/running-on-qemu.md)
+## Step 3 - Running on QEMU
+
+Click [here](https://github.com/spanou/baremetal-super-minimal/blob/main/docs/running-on-qemu.md) for step by step instructions on how to run your simple ASM app on QEMU.
 
