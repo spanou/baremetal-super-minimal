@@ -42,8 +42,8 @@ $(TARGET).bin : $(TARGET_ELF)
 $(TARGET).sym : $(TARGET_ELF)
 	$(GNU_ARM_NM) -l -n $(TARGET_ELF) >  $(TARGET).sym
 
-.PHONY: run
-run: 
+.PHONY: qemu-run
+qemu-run: 
 	$(QEMU_BIN) -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio  -kernel startup.bin &
 
 

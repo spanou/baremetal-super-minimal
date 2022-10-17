@@ -35,7 +35,9 @@ _start:
     MOV R0, #10
     MOV R1, #31
     BL addTwo
-    B . @Endless Loop
+    _endlessLoop:
+    NOP
+    B _endlessLoop
 
 .type copyString, %function
 copyString: @ R1(src), R2(dst)
@@ -53,5 +55,7 @@ copyString: @ R1(src), R2(dst)
         ADD R2, R2, #1
         B copyStringStart
     copyStringExit:
+        # Copy the zero itself
+        STRB R4, [R2]
         BX LR
 
