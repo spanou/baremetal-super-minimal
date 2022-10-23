@@ -19,7 +19,7 @@
 
 ### Prerequisites
 
-Before being able to use this docker image we are assuming the following prerequisites have been met.
+Before being able to use our docker image we are assuming the following prerequisites have been met.
 
 - You have a working docker desktop installed and running, if not please visit this docker [here](https://docs.docker.com/desktop/)
 - Your host has at least 2GB of free disk space

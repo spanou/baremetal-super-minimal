@@ -10,7 +10,7 @@
 
 # Introduction
 
-**Baremetal Super Minimal** is a project that enables you to learn embedded programming on the popular ARM Cortex M cores from the ground up. All the tools we will use are completely open source and at no cost _(you don't need a board to get started)_. We will not use vendor tools, ever. 
+**Baremetal Super Minimal** is a project that enables you to learn embedded programming on the popular ARM Cortex M cores from the ground up. All the tools we will use are completely open source and at no cost _(you don't need a board to get started)_. We are committing to using Open Source tools only, thereby avoiding any dependencies on vendor tools. 
 
 
 ## Next Steps
