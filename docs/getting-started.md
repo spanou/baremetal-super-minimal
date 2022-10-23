@@ -172,13 +172,13 @@ Find the GDB manual and other documentation resources online at:
 For help, type "help".
 Type "apropos word" to search for commands related to "word"...
 Reading symbols from startup.elf...done.
-The target architecture is assumed to be arm
-resetHandler () at src/startup.s:15
-15	    B _start
-(gdb) 
+resetHandler () at src/startup.s:13
+13	    B _start
+Breakpoint 1 at 0x20a: file src/startup.s, line 16.
+(gdb)
 ```
 
-At this point QEMU has loaded the binary in the system, the debugger has attached and the program execution has stopped at line (15) right at the ```B _start``` instruction
+At this point QEMU has loaded the binary in the system, the debugger has attached and the program execution has stopped at line (16) right after the ```_start``` label
 
 
 3. Let's check our source code, we do that by typing the following at the gdb prompt: 
@@ -195,60 +195,134 @@ What we should see immediately printed out is our source code:
 3	#
 4	.syntax unified
 5	.cpu cortex-m4
-6	.thumb
+6	.thumb 
 7	
-8	.include "consts.s"
-9	
-10	.text
-11	.global resetHandler
-12	
-13	.type resetHandler, %function
-14	resetHandler:
-15	    B _start
-16	
-17	_start:
-18	    NOP @Do Nothing
-19	    MRS R0, BASEPRI
-20	    MRS R0, PRIMASK
-21	    MRS R0, FAULTMASK
-22	    MRS R0, PSR
-23	    MRS R0, CONTROL
-24	    B . @Endless Loop
-25	
-26	
+8	.text
+9	.global resetHandler
+10	
+11	.type resetHandler, %function
+12	resetHandler:
+13	    B _start
+14	
+15	_start:
+16	    NOP @Do Nothing
+17	    MRS R0, BASEPRI
+18	    MRS R0, PRIMASK
+19	    MRS R0, FAULTMASK
+20	    MRS R0, PSR
+21	    MRS R0, CONTROL
+22	    LDR R0, ='H'
+23	    LDR R1, ='e'
+24	    LDR R2, ='l'
+25	    LDR R3, ='l'
+26	    LDR R4, ='o'
+27	    LDR R5, =' '
+28	    LDR R6, = 'W'
+29	    LDR R7, = 'o'
+30	    LDR R8, = 'r'
+31	    LDR R9, = 'l'
+32	    LDR R10, = 'd'
+33	    _endlessLoop:
+34	    NOP
+35	    B _endlessLoop
+36
+(gdb) 
 ```
 
 ### Setting a Breakpoint & Running to It
 
-4. Effectively at this point our code is loaded and ready to run, let's try a couple of things before we go forward. Let's try to put a breapoint on line 24 (before we go to an endless loop), we do so by typing the following: 
+4. Effectively at this point our code is loaded and ready to run, let's try a couple of things before we go forward. Let's try to put a breapoint on line 34, we do so by typing the following: 
 
 ```bash
-(gdb) b 24
-Breakpoint 1 at 0x232: file src/startup.s, line 24.
+(gdb) b 34
+Breakpoint 2 at 0x24e: file src/startup.s, line 35.
 (gdb) 
 ```
 
 As you can see the debugger has now placed a break on line 24. The info message shows us the following:
-- ```Breakpoint 1``` - This breakpoint is now associated with number 1, as in the first breakpoint.
-- ```at 0x232``` - The location of the PC (Program Counter) for that specific code line 
+- ```Breakpoint 2``` - This breakpoint is now associated with number 2, as in the second breakpoint.
+- ```at 0x24e``` - The location of the PC (Program Counter) for that specific code line 
 - ```file src/startup.s ``` - The file for which this breakpoint corresponds to 
-- ``` line 24 ``` - The line in ```src/startup.s``` which this breakpoint corresponds to. 
+- ``` line 35 ``` - The line in ```src/startup.s``` which this breakpoint corresponds to. 
 
-5. Now let's run the code until breakpoint #1 is hit. We do so by typing the following on the gdb prompt:
+5. Let's examine the values of our registers before we run the program, we do so by typing the following: 
+```
+(gdb) info registers
+r0             0x0                 0
+r1             0x0                 0
+r2             0x0                 0
+r3             0x0                 0
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x20000400          0x20000400
+lr             0xffffffff          -1
+pc             0x208               0x208 <resetHandler>
+xpsr           0x41000000          1090519040
+fpscr          0x0                 0
+```
+As you can see Registers R0 to R12 are zero'ed out. 
+
+
+6. Now let's run the code until breakpoint #2 is hit. We do so by typing the following on the gdb prompt:
 ```bash
 (gdb) c
 Continuing.
 
-Breakpoint 1, _start () at src/startup.s:24
-24	    B . @Endless Loop
+Breakpoint 1, _start () at src/startup.s:16
+16	    NOP @Do Nothing
+(gdb) c
+Continuing.
+
+Breakpoint 2, _endlessLoop () at src/startup.s:35
+35	    B _endlessLoop
+```
+You'll see from the above we had to hit 'c' twice to get us to the second breakpoint. 
+
+6. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched before it goes into an endless loop. So let's examine the registers to see if they are the right values after execution and before hiting the endlessLoop section. We do so by typing the following: 
+
+```bash
+(gdb) info registers
+r0             0x48                72
+r1             0x65                101
+r2             0x6c                108
+r3             0x6c                108
+r4             0x6f                111
+r5             0x20                32
+r6             0x57                87
+r7             0x6f                111
+r8             0x72                114
+r9             0x6c                108
+r10            0x64                100
+r11            0x0                 0
+r12            0x0                 0
+sp             0x20000400          0x20000400
+lr             0xffffffff          -1
+pc             0x24e               0x24e <_endlessLoop+2>
+xpsr           0x41000000          1090519040
+fpscr          0x0                 0
 (gdb) 
 ```
 
-6. We type 'c' for continue and then when the breakpoint is hit the code execution stops again. In this case we would expect the value on register R0 to be the last value loaded from the system CONTROL register. We do so by typing the following on the gdb prompt: 
+If you look carefull you will see that: 
 ```bash
-(gdb) p/x $r0
-$1 = 0x0
-(gdb) 
+R0 == 0x48 == 'H'
+R1 == 0x65 == 'e'
+R2 == 0x6c == 'l'
+R3 == 0x6c == 'l'
+R4 == 0x6f == 'o'
+R5 == 0x20 == ' '
+R6 == 0x57 == 'W'
+R7 == 0x6f == 'o'
+R8 == 0x72 == 'r'
+R9 == 0x6c == 'l'
+R10== 0x64 == 'd'
 ```
 
 ### Quiting QEMU & Cleaning Up
@@ -280,8 +354,8 @@ spanou@qemu-m4:~/development/baremetal-super-minimal$ ps -a
    45 pts/0    00:00:00 ps
 spanou@qemu-m4:~/development/baremetal-super-minimal$
 ```
-As you can see after the ```kill -9 30``` if we examine the running process, ```qemu-system-arm``` is not longer there! 
+As you can see after the ```kill -9 30``` if we examine the running processes again, ```qemu-system-arm``` is not longer there! 
 
 ## Next Steps
 
-Although not a terribly exciting example, a lot has happened behind the scenes to even get us here, don't worry if you don't understand everything just yet. The point of this Getting Started guide is to ensure everything works on your setup and to expose you to some very basic concepts. We will cover everything in detail in [Tutorial #1](). 
+Although not a terribly exciting example, a lot has happened behind the scenes to get us even to this point, don't worry if you don't understand everything just yet. The point of this Getting Started guide is to ensure everything works on your setup and to expose you to some very basic concepts. We will cover everything in detail in [Tutorial #1](). 

@@ -4,7 +4,6 @@ directory ./
 
 # Break at the _start
 break _start
-break _endlessLoop
 
 # Clear the registers 
 set $r0 = 0

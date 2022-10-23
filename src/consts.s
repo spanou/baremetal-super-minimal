@@ -10,5 +10,3 @@
 .equ MEM_MONITOR_SZ, 256
 
 .equ GPIO_BASE, 0x400E1000
-#.equ GPI_
-
