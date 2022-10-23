@@ -148,7 +148,8 @@ spanou@qemu-m4:~/development/baremetal-super-minimal$ make run
 qemu-system-arm -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio  -kernel startup.bin &
 ```
 
-2. Launch the Debugger and wait
+2. Launch the Debugger and Wait
+
 At this point we will launch the debugger and wait, we do so by typing the following: 
 ```bash 
 spanou@qemu-m4:~/development/baremetal-super-minimal$ gdb-multiarch startup.elf
