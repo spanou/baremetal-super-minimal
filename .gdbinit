@@ -1,9 +1,10 @@
 add-auto-load-safe-path ./.gdbinit
-target extended-remote localhost:3333 
+target extended-remote localhost:1234 
 directory ./
 
 # Break at the _start
 break _start
+break _endlessLoop
 
 # Clear the registers 
 set $r0 = 0
