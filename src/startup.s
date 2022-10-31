@@ -5,8 +5,6 @@
 .cpu cortex-m4
 .thumb
 
-.include "consts.s"
-
 .text
 .global resetHandler
 
@@ -21,6 +19,17 @@ _start:
     MRS R0, FAULTMASK
     MRS R0, PSR
     MRS R0, CONTROL
-    B . @Endless Loop
-
-
+    LDR R0, ='H'
+    LDR R1, ='e'
+    LDR R2, ='l'
+    LDR R3, ='l'
+    LDR R4, ='o'
+    LDR R5, =' '
+    LDR R6, = 'W'
+    LDR R7, = 'o'
+    LDR R8, = 'r'
+    LDR R9, = 'l'
+    LDR R10, = 'd'
+    _endlessLoop:
+    NOP
+    B _endlessLoop
