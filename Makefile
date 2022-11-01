@@ -60,7 +60,7 @@ PYTHON3=python3
 REGPARSER=scripts/regParser.py
 REGPARSER_OPTS_ASM=--output=s
 REGPARSER_OPTS_C=--output=c 
-REGPARSER_SAM4_CSV=scripts/sam4.csv
+REGPARSER_CSV=scripts/$(BOARD).csv
 GNU_ASM_FLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 
 
@@ -69,11 +69,11 @@ GNU_ASM_FLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 #
 GNU_GCC_FLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
 
-%.h: scripts/$(BOARD).csv
-	$(PYTHON3) $(REGPARSER) --output=c $< > $@
+# %.h: scripts/$(BOARD).csv
+# 	$(PYTHON3) $(REGPARSER) --output=c $< > $@
 
-%.s: scripts/$(BOARD).csv
-	$(PYTHON3) $(REGPARSER) --output=s $< > $@
+# %.s: scripts/$(BOARD).csv
+# 	$(PYTHON3) $(REGPARSER) --output=s $< > $@
 
 %.o: %.c
 	$(GNU_ARM_GCC) $(GNU_GCC_FLAGS) $< -o $@
@@ -102,9 +102,9 @@ debug:
 
 .PHONY: autogen
 autogen:
-	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_ASM) $(REGPARSER_SAM4_CSV) > include/sam4.s.inc
-	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_C) $(REGPARSER_SAM4_CSV) > include/sam4.h.inc
-	$(ECHO) "## TODO: Comming Soon\n" > include/qemu.s.inc
+	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_C) $(REGPARSER_CSV) > include/$(BOARD).h.inc
+	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_ASM) $(REGPARSER_CSV) > include/$(BOARD).s.inc
+
 
 .PHONY: all
 all: build_info autogen $(TARGET_ELF) $(TARGET).bin $(TARGET).lst $(TARGET).sym
@@ -132,6 +132,7 @@ clean:
 	$(RM) include/sam4.s.inc
 	$(RM) include/sam4.h.inc
 	$(RM) include/qemu.s.inc
+	$(RM) include/qemu.h.inc
 
 .PHONY: rebuild
 rebuild: clean all

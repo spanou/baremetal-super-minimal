@@ -1,0 +1,3 @@
+Type,Alias,Full Name,Offset,Mask/Size,Description
+C,MEM_MONITOR_ADDR, MEM_MONITOR_ADDR,0x20001000,0xFFFFFFFF,Memory Monitor Base Address
+C,MEM_MONITOR_SZ, MEM_MONITOR_SZ,0x00000100,0xFFFFFFFF,Memory Monitor Size
