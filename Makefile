@@ -41,7 +41,7 @@ ASM_SRCS= $(wildcard src/*.s)
 ASM_OBJS= $(subst .s,.o,$(ASM_SRCS))
 C_SRCS= $(wildcard src/*.c)
 C_OBJS= $(subst .c,.o,$(C_SRCS))
-# AUTOGENS = include/$(BOARD).h include/$(BOARD).s
+AUTOGENS= include/$(BOARD).h.inc include/$(BOARD).s.inc 
 OBJS= $(C_OBJS) $(ASM_OBJS)
 SRCS= $(ASM_SRCS) $(C_SRCS)
 GNU_PREFIX= arm-none-eabi
@@ -63,17 +63,16 @@ REGPARSER_OPTS_C=--output=c
 REGPARSER_CSV=scripts/$(BOARD).csv
 GNU_ASM_FLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 
-
 #
 # TODO: Need to set up the right flags for the gcc compiler
 #
 GNU_GCC_FLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
 
-# %.h: scripts/$(BOARD).csv
-# 	$(PYTHON3) $(REGPARSER) --output=c $< > $@
+%.h.inc: scripts/$(BOARD).csv
+	$(PYTHON3) $(REGPARSER) --output=c $< > $@
 
-# %.s: scripts/$(BOARD).csv
-# 	$(PYTHON3) $(REGPARSER) --output=s $< > $@
+%.s.inc: scripts/$(BOARD).csv
+	$(PYTHON3) $(REGPARSER) --output=s $< > $@
 
 %.o: %.c
 	$(GNU_ARM_GCC) $(GNU_GCC_FLAGS) $< -o $@
@@ -82,8 +81,7 @@ GNU_GCC_FLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATF
 	$(GNU_ARM_AS) $(GNU_ASM_FLAGS) $< -o $@
 
 
-#$(TARGET_ELF): $(AUTOGENS) $(OBJS)
-$(TARGET_ELF): $(OBJS)
+$(TARGET_ELF): $(AUTOGENS) $(OBJS)
 	$(GNU_ARM_LINKER) $(OBJS) -nostartfiles -o $@ -T linker.ld
 
 $(TARGET).lst : $(TARGET_ELF)
@@ -97,17 +95,11 @@ $(TARGET).sym : $(TARGET_ELF)
 
 .PHONY: debug
 debug:
-
 	$(QEMU_BIN) -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio -kernel $(TARGET).bin &
-
-.PHONY: autogen
-autogen:
-	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_C) $(REGPARSER_CSV) > include/$(BOARD).h.inc
-	$(PYTHON3) $(REGPARSER) $(REGPARSER_OPTS_ASM) $(REGPARSER_CSV) > include/$(BOARD).s.inc
 
 
 .PHONY: all
-all: build_info autogen $(TARGET_ELF) $(TARGET).bin $(TARGET).lst $(TARGET).sym
+all: build_info  $(TARGET_ELF) $(TARGET).bin $(TARGET).lst $(TARGET).sym
 
 
 .PHONY: build_info
