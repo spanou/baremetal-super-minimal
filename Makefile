@@ -5,6 +5,7 @@
 ## o - sam4 (SAM4L XPlained Pro) => [1]
 ##
 BOARD?= qemu
+
 ##
 ## Options are:
 ## o - dev
@@ -12,8 +13,45 @@ BOARD?= qemu
 ##
 BUILD?= dev
 
+##
+## The project name
+##
 PROJECT="BareMetal Super Minimal"
 
+##
+## SRC_DIRS contains a list of space seperated directories that contain source files for either *.c or *.s
+## HDR_DIRS contains a list of space seperated directories that contain header files
+##
+## If you want to add another directory for either type just added it at the end of each list
+##
+SRC_DIRS=./src
+HDR_DIRS=./include
+OBJS_DIR=./obj
+
+##
+## Build the includes from the Header Directory List $(HDR_DIRS)
+##
+INCLUDES=$(foreach d, $(HDR_DIRS), -I$(d))
+
+##
+## Build the soruces and objects files list
+##
+S_SRCS=$(foreach d, $(SRC_DIRS), $(notdir $(wildcard $(d)/*.s)))
+C_SRCS=$(foreach d, $(SRC_DIRS), $(notdir $(wildcard $(d)/*.c)))
+OBJS= $(addprefix $(OBJS_DIR)/, $(subst .s,.o,$(S_SRCS)))
+OBJS+=$(addprefix $(OBJS_DIR)/, $(subst .c,.o,$(C_SRCS)))
+
+##
+## Add the Sources Directories in the search path for both
+## source *.c and *.s files
+##
+vpath %.s $(SRC_DIRS)
+vpath %.c $(SRC_DIRS)
+
+
+##
+## Set up board specific options
+##
 ifeq ($(BOARD), qemu)
 	C_PLATFORM_FLAGS= -DPLATFORM=0
 	ASM_PLATFORM_FLAGS=--defsym PLATFORM=0
@@ -24,33 +62,32 @@ else ifeq ($(BOARD), sam4)
 	CPU_FLAGS=-mthumb -mcpu=cortex-m4
 endif
 
-
+##
+## Set up build specific options
+##
 ifeq ($(BUILD), rel)
 	C_BUILD_FLAGS=
 	ASM_BUILD_FLAGS=
 else ifeq ($(BUILD), dev)
 	C_BUILD_FLAGS=-g -O0
 	ASM_BUILD_FLAGS=-g
-endif 
+endif
 
-INCLUDES=-I./src -I./include
+##
+## Default goal is all
+##
+.DEFAULT_GOAL:=all
+
 CLIB_FLAGS=-nostdlib -nostartfiles -ffreestanding
+AUTOGENS= include/$(BOARD).h.inc include/$(BOARD).s.inc
 
-
-ASM_SRCS= $(wildcard src/*.s)
-ASM_OBJS= $(subst .s,.o,$(ASM_SRCS))
-C_SRCS= $(wildcard src/*.c)
-C_OBJS= $(subst .c,.o,$(C_SRCS))
-AUTOGENS= include/$(BOARD).h.inc include/$(BOARD).s.inc 
-OBJS= $(C_OBJS) $(ASM_OBJS)
-SRCS= $(ASM_SRCS) $(C_SRCS)
 GNU_PREFIX= arm-none-eabi
-GNU_ARM_AS= $(GNU_PREFIX)-as
-GNU_ARM_GCC= $(GNU_PREFIX)-gcc
-GNU_ARM_LINKER= $(GNU_PREFIX)-ld
-GNU_ARM_OBJDUMP= $(GNU_PREFIX)-objdump
-GNU_ARM_OBJCOPY= $(GNU_PREFIX)-objcopy
-GNU_ARM_NM= $(GNU_PREFIX)-nm
+AS= $(GNU_PREFIX)-as
+CC= $(GNU_PREFIX)-gcc
+LL= $(GNU_PREFIX)-ld
+OBJDUMP= $(GNU_PREFIX)-objdump
+OBJCOPY= $(GNU_PREFIX)-objcopy
+NM= $(GNU_PREFIX)-nm
 QEMU_BASE=
 QEMU_BIN= $(QEMU_BASE)qemu-system-arm
 TARGET= startup
@@ -59,14 +96,11 @@ ECHO=@echo
 PYTHON3=python3
 REGPARSER=scripts/regParser.py
 REGPARSER_OPTS_ASM=--output=s
-REGPARSER_OPTS_C=--output=c 
+REGPARSER_OPTS_C=--output=c
 REGPARSER_CSV=scripts/$(BOARD).csv
-GNU_ASM_FLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 
-#
-# TODO: Need to set up the right flags for the gcc compiler
-#
-GNU_GCC_FLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
+ASFLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
+CFLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
 
 %.h.inc: scripts/$(BOARD).csv
 	$(PYTHON3) $(REGPARSER) --output=c $< > $@
@@ -74,24 +108,23 @@ GNU_GCC_FLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATF
 %.s.inc: scripts/$(BOARD).csv
 	$(PYTHON3) $(REGPARSER) --output=s $< > $@
 
-%.o: %.c
-	$(GNU_ARM_GCC) $(GNU_GCC_FLAGS) $< -o $@
+$(OBJS_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 
-%.o: %.s
-	$(GNU_ARM_AS) $(GNU_ASM_FLAGS) $< -o $@
-
+$(OBJS_DIR)/%.o: %.s
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(TARGET_ELF): $(AUTOGENS) $(OBJS)
-	$(GNU_ARM_LINKER) $(OBJS) -nostartfiles -o $@ -T linker.ld
+	$(LL) $(OBJS) -nostartfiles -o $@ -T linker.ld
 
 $(TARGET).lst : $(TARGET_ELF)
-	$(GNU_ARM_OBJDUMP) -h -S $(TARGET_ELF) > $(TARGET).lst
+	$(OBJDUMP) -h -S $(TARGET_ELF) > $(TARGET).lst
 
 $(TARGET).bin : $(TARGET_ELF)
-	$(GNU_ARM_OBJCOPY) -O binary $(TARGET_ELF) $(TARGET).bin
+	$(OBJCOPY) -O binary $(TARGET_ELF) $(TARGET).bin
 
 $(TARGET).sym : $(TARGET_ELF)
-	$(GNU_ARM_NM) -l -n $(TARGET_ELF) > $(TARGET).sym
+	$(NM) -l -n $(TARGET_ELF) > $(TARGET).sym
 
 .PHONY: debug
 debug:
@@ -112,11 +145,12 @@ build_info:
 	$(ECHO) ""
 	$(ECHO) " For Help type 'make help'"
 	$(ECHO) "==========================================================================================="
+	$(shell if [ ! -d "$(OBJS_DIR)" ]; then mkdir $(OBJS_DIR); fi)
 
 
 .PHONY:clean
 clean:
-	$(RM) $(OBJS)
+	$(RM) -rf $(OBJS_DIR)
 	$(RM) *.elf
 	$(RM) *.lst
 	$(RM) *.bin
@@ -131,36 +165,11 @@ rebuild: clean all
 
 .PHONY: inspect
 inspect:
-	$(ECHO) "BOARD is...................: $(BOARD)"
-	$(ECHO) "BUILD is...................: $(BUILD)"
-	$(ECHO) "INCLUDES are...............: $(INCLUDES)"
-	$(ECHO) "CLIB_FLAGS are.............: $(CLIB_FLAGS)"
-	$(ECHO) "C_PLATFORM_FLAGS are.......: $(C_PLATFORM_FLAGS)"
-	$(ECHO) "ASM_PLATFORM_FLAGS are.....: $(ASM_PLATFORM_FLAGS)"
-	$(ECHO) "CPU_FLAGS are..............: $(CPU_FLAGS)"
-	$(ECHO) "ASM_OBJS are...............: $(ASM_OBJS)"
-	$(ECHO) "C_SRCS are.................: $(C_SRCS)"
-	$(ECHO) "C_OBJS are.................: $(C_OBJS)"
-	$(ECHO) "OBJS are...................: $(OBJS)"
-	$(ECHO) "SRCS are...................: $(SRCS)"
-	$(ECHO) "GNU_PREFIX is..............: $(GNU_PREFIX)"
-	$(ECHO) "GNU_ARM_AS is..............: $(GNU_ARM_AS)"
-	$(ECHO) "GNU_ARM_GCC is.............: $(GNU_ARM_GCC)"
-	$(ECHO) "GNU_ARM_LINKER is..........: $(GNU_ARM_LINKER)"
-	$(ECHO) "GNU_ARM_OBJDUMP is.........: $(GNU_ARM_OBJDUMP)"
-	$(ECHO) "GNU_ARM_OBJCOPY is.........: $(GNU_ARM_OBJCOPY)"
-	$(ECHO) "GNU_ARM_NM is..............: $(GNU_ARM_NM)"
-	$(ECHO) "QEMU_BASE is...............: $(QEMU_BASE)"
-	$(ECHO) "QEMU_BIN is................: $(QEMU_BIN)"
-	$(ECHO) "TARGET are.................: $(TARGET)"
-	$(ECHO) "TARGET_ELF are.............: $(TARGET_ELF)"
-	$(ECHO) "ECHO is....................: $(ECHO)"
-	$(ECHO) "GNU_ASM_FLAGS are..........: $(GNU_ASM_FLAGS)"
-	$(ECHO) "REGPARSER_OPTS_ASM are.....: $(REGPARSER_OPTS_ASM)"
-	$(ECHO) "REGPARSER_OPTS_C are.......: $(REGPARSER_OPTS_C)"
-	$(ECHO) "REGPARSER_SAM4_CSV is......: $(REGPARSER_SAM4_CSV)"
-# 	$(ECHO) "AUTOGENS are...............: $(AUTOGENS)"
-
+	$(foreach var, $(sort $(.VARIABLES)), \
+		$(if $(filter-out environment% default automatic, $(origin $(var))), \
+			$(info $(var)=$($(var)))\
+		) \
+	)
 
 
 .PHONY: help
