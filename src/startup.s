@@ -1,6 +1,6 @@
-#
-# Start Up Assembler to Learn GCC ASM for ARM M4
-#
+@
+@ Start Up Assembler to Learn GCC ASM for ARM M4
+@
 .syntax unified
 .cpu cortex-m4
 .thumb
@@ -30,6 +30,28 @@ _start:
     LDR R8, = 'r'
     LDR R9, = 'l'
     LDR R10, = 'd'
+    
+    @ Zeroize the BSS segment
+    BL initBss
+    
+    @ Call in the startMain
+    BL startMain
+
+    @ Spin Around endlessly
     _endlessLoop:
-    NOP
-    B _endlessLoop
+        NOP
+        B _endlessLoop
+
+
+.type initBss, %function
+initBss:
+    LDR R0, =_bssStart
+    LDR R1, =_bssEnd
+    SUB R2, R1, R0
+    LDR R3, =0
+    _zeroBssLoop:
+        STR R3, [R0]
+        ADD R0, #4
+        CMP R0, R1
+        BNE _zeroBssLoop
+    BX LR

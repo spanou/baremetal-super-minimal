@@ -20,15 +20,24 @@ SECTIONS {
          * _stringsSz:     size of the string section.
          */
         _stringsStart = .;
-        *(._strs)
+        *(._strs);
         _stringsEnd = .;
-        _stringsSz = _stringsEnd - _stringsStart;
     } >FLASH
 
-    .data (NOLOAD) :{
+    .data (NOLOAD) : {
         . = . + 0x400;
         _stackEnd = .;
-        *(.data)
+        . = ALIGN(4);
+        *(.data);
+        . = ALIGN(4);
+    } >SRAM
+
+    .bss (NOLOAD) : {
+        _bssStart = .;
+        *(.bss);
+        . = ALIGN(4);
+        _bssEnd = .;
+        _bssSize = _bssEnd - _bssStart;
     } >SRAM
 
 }

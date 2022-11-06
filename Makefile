@@ -78,13 +78,14 @@ endif
 ##
 .DEFAULT_GOAL:=all
 
-CLIB_FLAGS=-nostdlib -nostartfiles -ffreestanding
+CLIB_FLAGS=-nostdlib -nostartfiles -ffreestanding -fno-common
 AUTOGENS= include/$(BOARD).h.inc include/$(BOARD).s.inc
 
 GNU_PREFIX= arm-none-eabi
 AS= $(GNU_PREFIX)-as
 CC= $(GNU_PREFIX)-gcc
 LL= $(GNU_PREFIX)-ld
+SIZE=$(GNU_PREFIX)-size
 OBJDUMP= $(GNU_PREFIX)-objdump
 OBJCOPY= $(GNU_PREFIX)-objcopy
 NM= $(GNU_PREFIX)-nm
@@ -101,6 +102,7 @@ REGPARSER_CSV=scripts/$(BOARD).csv
 
 ASFLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 CFLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
+SZFLAGS= -t -x -A --common
 
 %.h.inc: scripts/$(BOARD).csv
 	$(PYTHON3) $(REGPARSER) --output=c $< > $@
@@ -132,7 +134,7 @@ debug:
 
 
 .PHONY: all
-all: build_info  $(TARGET_ELF) $(TARGET).bin $(TARGET).lst $(TARGET).sym
+all: build_info  $(TARGET_ELF) $(TARGET).bin $(TARGET).lst $(TARGET).sym build-size
 
 
 .PHONY: build_info
@@ -144,8 +146,14 @@ build_info:
 	$(ECHO) " Build      : $(BUILD)"
 	$(ECHO) ""
 	$(ECHO) " For Help type 'make help'"
-	$(ECHO) "==========================================================================================="
+	$(ECHO) "-------------------------------------------------------------------------------------------"
 	$(shell if [ ! -d "$(OBJS_DIR)" ]; then mkdir $(OBJS_DIR); fi)
+
+
+.PHONY: build-size
+build-size:
+	$(SIZE) $(SZFLAGS) $(TARGET_ELF)
+	$(ECHO) "==========================================================================================="
 
 
 .PHONY:clean
