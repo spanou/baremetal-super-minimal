@@ -85,6 +85,8 @@ GNU_PREFIX= arm-none-eabi
 AS= $(GNU_PREFIX)-as
 CC= $(GNU_PREFIX)-gcc
 LL= $(GNU_PREFIX)-ld
+GDB= gdb-multiarch
+PKILL= pkill
 SIZE=$(GNU_PREFIX)-size
 OBJDUMP= $(GNU_PREFIX)-objdump
 OBJCOPY= $(GNU_PREFIX)-objcopy
@@ -99,6 +101,8 @@ REGPARSER=scripts/regParser.py
 REGPARSER_OPTS_ASM=--output=s
 REGPARSER_OPTS_C=--output=c
 REGPARSER_CSV=scripts/$(BOARD).csv
+GDB_PRE_INIT= -ix=./scripts/$(BOARD).pre.gdbinit
+GDB_POST_INIT= -x=./scripts/$(BOARD).post.gdbinit
 
 ASFLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
 CFLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
@@ -130,7 +134,14 @@ $(TARGET).sym : $(TARGET_ELF)
 
 .PHONY: debug
 debug:
+ifeq ($(BOARD), qemu)
 	$(QEMU_BIN) -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio -kernel $(TARGET).bin &
+	$(GDB) $(GDB_PRE_INIT) $(GDB_POST_INIT) $(TARGET_ELF)
+	$(PKILL) $(QEMU_BIN)
+else ifeq ($(BOARD), sam4)
+	$(ECHO) "Open a new terminal on your host and type: openocd -f ./scripts/openofc.cfg"
+	$(GDB) $(GDB_PRE_INIT) $(GDB_POST_INIT) $(TARGET_ELF)
+endif 
 
 
 .PHONY: all
