@@ -115,7 +115,7 @@ Usage:
   options: BOARD=[qemu|sam4] BUILD=[debug|release]
 
       BOARD= 
-          qemu    -> build for a QEMU's Netduino Plus 2 Virtual Board (default)
+          qemu    -> build for a QEMU\'s Netduino Plus 2 Virtual Board (default)
           sam4    -> build for a SAM4 XPlained Pro Board
       BUILD= 
           dev     -> development build: all debug symbols are in, drops optimization to 0
@@ -218,8 +218,7 @@ Breakpoint 2 at 0x25c: file ./src/startup.s, line 35.
 ```
 ![make-debug-qemu](./img/make-debug-qemu-01.png)
 
-
-As you can see the debugger has now placed a break on line 34. The info message shows us the following:
+As you can see the debugger has now placed a break on line 35. The info message shows us the following:
 - ```Breakpoint 2``` - This breakpoint is now associated with number 2, as in the second breakpoint.
 - ```at 0x25c``` - The location of the PC (Program Counter) for that specific code line
 - ```file src/startup.s ``` - The file for which this breakpoint corresponds to
@@ -243,11 +242,11 @@ Continuing.
 Breakpoint 2, _start () at ./src/startup.s:35
 ```
 
-3. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched. So let's examine the registers to see if they are the right values after execution and before hiting the endlessLoop section. As you can see GDB has highligted all the values that changed since the first breakpoint was hit.
+3. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched. So let's examine the registers to see if they are the right values after execution. As you can see GDB has highligted all the values that changed since the first breakpoint was hit.
 
 ![make-debug-qemu](./img/make-debug-qemu-02.png)
 
-If you look carefull you will see that:
+If you look carefully you will see that:
 ```bash
 R0 == 0x48 == 'H'
 R1 == 0x65 == 'e'
