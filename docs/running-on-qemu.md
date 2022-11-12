@@ -16,7 +16,7 @@ make run
 gdb-multiarch startup.elf
 ```
 
-If we were to look inside the Makefile you will find the following command: 
+If we were to look inside the Makefile you will find the following command:
 ```
 qemu-system-arm -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio  -kernel startup.bin &
 ```
@@ -27,7 +27,7 @@ Let's break this down a bit to see what all those options mean:
     * `-display none` specifies there is not visual display
     * `-S` Stops the QEMU at start waiting for a debugger to be attached.
     * `-s` Specifies the debug server to listen to localhost:1234
-    * `-serial none` specifies there is no serial port 
+    * `-serial none` specifies there is no serial port
     * `-serial mon:stdio` put the monitor in the standard output
     * `-kernel` specifies which image to select to start from
 
@@ -50,7 +50,7 @@ spanou@qemu-m4:~/development/c/baremetal-super-minimal$ kill -9 329
 spanou@qemu-m4:~/development/c/baremetal-super-minimal$ ps -a
   PID TTY          TIME CMD
   333 pts/0    00:00:00 ps
-spanou@qemu-m4:~/development/c/baremetal-super-minimal$ 
+spanou@qemu-m4:~/development/c/baremetal-super-minimal$
 ```
 ***
 
