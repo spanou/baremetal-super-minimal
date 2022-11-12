@@ -1,3 +1,12 @@
 Type,Alias,Full Name,Offset,Mask/Size,Description
 C,MEM_MONITOR_ADDR, MEM_MONITOR_ADDR,0x20001000,0xFFFFFFFF,Memory Monitor Base Address
 C,MEM_MONITOR_SZ, MEM_MONITOR_SZ,0x00000100,0xFFFFFFFF,Memory Monitor Size
+R,SYST_CSR, SYST_CSR, 0xE000E010,0xFFFFFFFF, SysTick Control and Status Register
+F,SYST_CSR_ENBL,SYST_CSR_ENABLE, 0, 0x000000001, Indicates the enable status of the SysTick Counter[0=disabled, 1=enabled]
+F,SYST_CSR_TCKI,SYST_CSR_TICKINT, 1, 0x000000001, Indicates whether counting to 0 causes the status of the SysTick exception to change to pending: [0= No Exception, 1= Trigger Exception]
+F,SYST_CSR_CLKS,SYST_CSR_CLKSOURCE, 2, 0x000000001, Indicates the SysTick clock source:[0=External, 1=Processor Clock]
+F,SYS_CSR_CNTF, SYS_CSR_COUNTFLAG, 16, 0x000000001, Indicates whether the counter has counted to 0 since the last read of this register:[0 = Timer Not Counted to 0, 1 = Counter Has Counted 0]
+R,SYST_RVR, SYST_RVR, 0xE000E014,0xFFFFFFFF, SysTick Reload Value Register
+R,SYST_CVR, SYST_CVR, 0xE000E018,0xFFFFFFFF, SysTick Current Value Register
+R,SYST_CALIB, SYST_CALIB, 0xE000E01C,0xFFFFFFFF, SysTick Calibration Value Register
+C,SYST_RELOAD_VAL, SYST_RELOAD_VALUE,10000,0xFFFFFFFF,SysTick Reload Value

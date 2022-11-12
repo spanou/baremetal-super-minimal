@@ -1,11 +1,11 @@
-#
-# Consts for the project
-#
+@
+@ Consts for the project
+@
 .syntax unified
 .cpu cortex-m4
 .thumb
 
-# Check if the Platform is QEMU = 0, SAM4 = 1
+@ Check if the Platform is QEMU = 0, SAM4 = 1
 .if PLATFORM == 1
 
 	.include "sam4.s.inc"
@@ -19,3 +19,5 @@
 	.error "Unrecognized Platform Selected"
 
 .endif
+
+.end

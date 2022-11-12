@@ -32,6 +32,7 @@ OBJS_DIR=./obj
 ## Build the includes from the Header Directory List $(HDR_DIRS)
 ##
 INCLUDES=$(foreach d, $(HDR_DIRS), -I$(d))
+INCLUDES+= -I./
 
 ##
 ## Build the soruces and objects files list

@@ -269,17 +269,20 @@ def printDataModelInAsm(model):
         if node["type"] == "R"  or node["type"] == "C":
             newComment = f"\n##\n## Register\n## {node['name']:.<30}: {node['desc']}\n##"
             newEQU = f".equ {node['alias']}, ({node['val']})"
+            globEQU = f".global {node['alias']}"
             print(newComment)
             print(newEQU)
+            print(globEQU)
 
         if node["type"] == "F":
             newComment = f"\n##\n## Field\n## {node['name']:.<30}: {node['desc']}\n##"
             bitFieldNumber = (2**int(node['size'],16)) - 1
             bitFieldHexStr = f"0x{bitFieldNumber:08X}"
             newEQU = f".equ {node['alias']}, ({bitFieldHexStr} << {node['val']})"
+            globEQU = f".global {node['alias']}"
             print(newComment)
             print(newEQU)
-            continue
+            print(globEQU)
 
 
     return model
