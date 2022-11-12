@@ -125,7 +125,7 @@ def processFile(file):
 
         if node == None:
             continue
-        else: 
+        else:
             model.append(node)
 
     return model
@@ -193,7 +193,7 @@ def printDataModelInCField(node):
             o - node -> a signle node consisting of the info for one node.
 
         Returns:
-            N/A 
+            N/A
 
     '''
 
@@ -392,7 +392,7 @@ def fileToStringArray(file):
     '''
     if None == file:
         return None
-    
+
     if False == os.path.exists(file):
         return None
 
@@ -404,7 +404,7 @@ def fileToStringArray(file):
     # store each line as a single entry in the lines list.
     with open(file, encoding='utf-8') as f:
         lines = f.readlines()
-    
+
     # Bail out gracefully if the line returned are None
     if lines is None:
         print(f"Failed to Read the contents of the file {file}")
@@ -418,16 +418,16 @@ def fileToStringArray(file):
         # Create a new description field for remaining elements
         desc = ""
 
-        # If there are more than 6 fields means the description 
-        # contained comma(s), concatenate them. 
-        if len(basicSplit) > 6 :        
-            for e in basicSplit[5:]: 
+        # If there are more than 6 fields means the description
+        # contained comma(s), concatenate them.
+        if len(basicSplit) > 6 :
+            for e in basicSplit[5:]:
                 desc += e
         else:
             desc = basicSplit[5]
 
-        # Add the concatenated description back into 
-        # the processed elements 
+        # Add the concatenated description back into
+        # the processed elements
         elements.append(desc)
 
         # Now add the properly split string into the raw list.
