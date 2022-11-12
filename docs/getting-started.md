@@ -82,7 +82,7 @@ _**Keep your console up and running for the next step.**_
 
 ### Cloning the Git Repo
 
-1. While your container is up and running and you have access to its consoler from the previous step, go ahead and type the following:
+1. While your container is up and running and you have access to its console from the previous step, go ahead and type the following:
 
 ```bash
 cd development/
@@ -93,20 +93,40 @@ git clone https://github.com/spanou/baremetal-super-minimal.git
 ```bash
 spanou@qemu-m4:~/development$ git clone https://github.com/spanou/baremetal-super-minimal.git
 Cloning into 'baremetal-super-minimal'...
-remote: Enumerating objects: 62, done.
-remote: Counting objects: 100% (62/62), done.
-remote: Compressing objects: 100% (48/48), done.
-remote: Total 62 (delta 27), reused 34 (delta 11), pack-reused 0
-Unpacking objects: 100% (62/62), done.
+remote: Enumerating objects: 170, done.
+remote: Counting objects: 100% (170/170), done.
+remote: Compressing objects: 100% (116/116), done.
+remote: Total 170 (delta 80), reused 127 (delta 46), pack-reused 0
+Receiving objects: 100% (170/170), 1.33 MiB | 2.16 MiB/s, done.
+Resolving deltas: 100% (80/80), done.
 ```
-3. Checkout the qemu branch
-To proceed with our QEMU example make sure you checkout the ```qemu``` branch.
+3. Move to the project directory & get some help 
+
+Since everything (almost) in our project is drive through our Makefile, let's see what options we have. Go ahead and execute the followign commands.
 ```bash
 spanou@qemu-m4:~/development$ cd baremetal-super-minimal/
-spanou@qemu-m4:~/development/baremetal-super-minimal$ git checkout qemu
-Switched to branch 'qemu'
-Your branch is up to date with 'origin/qemu'.
-spanou@qemu-m4:~/development/baremetal-super-minimal$
+spanou@qemu-m4:~/development/baremetal-super-minimal$ make help
+==========================================================================================
+Usage:
+
+ make <options> <target>
+
+  options: BOARD=[qemu|sam4] BUILD=[debug|release]
+
+     qemu    -> build for a QEMU's Netduino Plus 2 Virtual Board (default)
+     sam4    -> build for a SAM4 XPlained Pro Board
+     dev     -> full development build, all debug symbols and drops optimization to 0
+     rel     -> rull release build, the production build no debug symbols and optimization
+
+  target: [all|debug|clean|rebuild|help]
+
+     all     -> builds all artifacts such as the *.elf, *.bin, *.sym and *.lst files
+     debug   -> loads the executable binary and attaches the debugger
+     clean   -> removes all build artifacts inlcuding object files
+     rebuild -> removes all build artifacts and rebuilds the from scratch
+     help    -> prints this message
+==========================================================================================
+spanou@qemu-m4:~/development/baremetal-super-minimal$ 
 ```
 
 ### Building the Basic Example
