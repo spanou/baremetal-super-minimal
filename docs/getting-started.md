@@ -102,7 +102,8 @@ Resolving deltas: 100% (80/80), done.
 ```
 3. Move to the project directory & get some help 
 
-Since everything (almost) in our project is drive through our Makefile, let's see what options we have. Go ahead and execute the followign commands.
+Since everything (almost) in our project is driven through our Makefile, let's see what options we have. 
+Go ahead and execute the followign commands:
 ```bash
 spanou@qemu-m4:~/development$ cd baremetal-super-minimal/
 spanou@qemu-m4:~/development/baremetal-super-minimal$ make help
@@ -113,10 +114,12 @@ Usage:
 
   options: BOARD=[qemu|sam4] BUILD=[debug|release]
 
-     qemu    -> build for a QEMU's Netduino Plus 2 Virtual Board (default)
-     sam4    -> build for a SAM4 XPlained Pro Board
-     dev     -> full development build, all debug symbols and drops optimization to 0
-     rel     -> rull release build, the production build no debug symbols and optimization
+      BOARD= 
+          qemu    -> build for a QEMU's Netduino Plus 2 Virtual Board (default)
+          sam4    -> build for a SAM4 XPlained Pro Board
+      BUILD= 
+          dev     -> development build: all debug symbols are in, drops optimization to 0
+          rel     -> release build: no debug symbols, full on optimization
 
   target: [all|debug|clean|rebuild|help]
 
@@ -129,18 +132,51 @@ Usage:
 spanou@qemu-m4:~/development/baremetal-super-minimal$ 
 ```
 
+The ```make help``` command shows us the above help, by default every build has BOARD=qemu and BUILD=dev and target is set by default to **all**, thereby we don't need to type that every time. Effectively our project supports the QEMU Netduino Plus 2 Virtual Board as well as the SAM4 XPlained Pro. Each project can be build either for development or for release. 
+
 ### Building the Basic Example
 
 1. Build the basic example by typing:
 ```bash
-spanou@qemu-m4:~/development/baremetal-super-minimal$ make all
-arm-none-eabi-as -g -I./src -I./include src/consts.s -o src/consts.o
-arm-none-eabi-as -g -I./src -I./include src/startup.s -o src/startup.o
-arm-none-eabi-as -g -I./src -I./include src/vector_table.s -o src/vector_table.o
-arm-none-eabi-ld  src/consts.o src/startup.o src/vector_table.o -nostartfiles  -o startup.elf -T linker.ld
+spanou@qemu-m4:~/development/baremetal-super-minimal$ make 
+===========================================================================================
+ Build Date : Fri 11 Nov 2022 08:43:10 PM PST
+ Project    : BareMetal Super Minimal
+ Board      : qemu
+ Build      : dev
+
+ For Help type 'make help'
+-------------------------------------------------------------------------------------------
+python3 scripts/regParser.py --output=c scripts/qemu.csv > include/qemu.h.inc
+python3 scripts/regParser.py --output=s scripts/qemu.csv > include/qemu.s.inc
+arm-none-eabi-as -g  -I./include --defsym PLATFORM=0 ./src/main.s -o obj/main.o
+arm-none-eabi-as -g  -I./include --defsym PLATFORM=0 ./src/consts.s -o obj/consts.o
+arm-none-eabi-as -g  -I./include --defsym PLATFORM=0 ./src/startup.s -o obj/startup.o
+arm-none-eabi-as -g  -I./include --defsym PLATFORM=0 ./src/vector_table.s -o obj/vector_table.o
+arm-none-eabi-gcc -g -O0  -I./include -mthumb -mcpu=cortex-m4 -nostdlib -nostartfiles -ffreestanding -fno-common -DPLATFORM=0 -c ./src/test.c -o obj/test.o
+arm-none-eabi-ld ./obj/main.o ./obj/consts.o ./obj/startup.o ./obj/vector_table.o ./obj/test.o -nostartfiles -o startup.elf -T linker.ld
 arm-none-eabi-objcopy -O binary startup.elf startup.bin
 arm-none-eabi-objdump -h -S startup.elf > startup.lst
-arm-none-eabi-nm -l -n startup.elf >  startup.sym
+arm-none-eabi-nm -l -n startup.elf > startup.sym
+arm-none-eabi-size -t -x -A --common startup.elf
+startup.elf  :
+section            size         addr
+.text             0x2c0          0x0
+.data             0x400   0x20000000
+.bss              0x190   0x20000400
+.ARM.attributes    0x2f          0x0
+.comment           0x57          0x0
+.debug_line       0x127          0x0
+.debug_info       0x11c          0x0
+.debug_abbrev      0xba          0x0
+.debug_aranges     0x60          0x0
+.debug_str        0x156          0x0
+.debug_frame       0x38          0x0
+*COM*               0x0          0x0
+Total             0xdc1
+
+
+===========================================================================================
 spanou@qemu-m4:~/development/baremetal-super-minimal$
 ```
 
@@ -164,170 +200,52 @@ At this step what we will do is to load the ```startup.bin``` in QEMU, attach th
 
 1. To launch QEMU with the example, type the following on the same window as the previous step:
 ```bash
-spanou@qemu-m4:~/development/baremetal-super-minimal$ make run
-qemu-system-arm -M netduinoplus2 -display none -S -s -serial none -serial none -serial mon:stdio  -kernel startup.bin &
+spanou@qemu-m4:~/development/baremetal-super-minimal$ make debug
+
 ```
-
-2. Launch the Debugger and Wait
-
-At this point we will launch the debugger and wait, we do so by typing the following:
-```bash
-spanou@qemu-m4:~/development/baremetal-super-minimal$ gdb-multiarch startup.elf
-```
-
 The following will appear on your screen:
-```bash
-GNU gdb (Debian 8.2.1-2+b3) 8.2.1
-Copyright (C) 2018 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-Type "show copying" and "show warranty" for details.
-This GDB was configured as "x86_64-linux-gnu".
-Type "show configuration" for configuration details.
-For bug reporting instructions, please see:
-<http://www.gnu.org/software/gdb/bugs/>.
-Find the GDB manual and other documentation resources online at:
-    <http://www.gnu.org/software/gdb/documentation/>.
-
-For help, type "help".
-Type "apropos word" to search for commands related to "word"...
-Reading symbols from startup.elf...done.
-resetHandler () at src/startup.s:13
-13	    B _start
-Breakpoint 1 at 0x20a: file src/startup.s, line 16.
-(gdb)
-```
+![make-debug-qemu](./img/make-debug-qemu.png)
 
 At this point QEMU has loaded the binary in the system, the debugger has attached and the program execution has stopped at line (16) right after the ```_start``` label
 
-
-3. Let's check our source code, we do that by typing the following at the gdb prompt:
-```bash
-(gdb) list 1,100
-
-```
-
-What we should see immediately printed out is our source code:
-```bash
-(gdb) list 1,100
-1	#
-2	# Start Up Assembler to Learn GCC ASM for ARM M4
-3	#
-4	.syntax unified
-5	.cpu cortex-m4
-6	.thumb
-7
-8	.text
-9	.global resetHandler
-10
-11	.type resetHandler, %function
-12	resetHandler:
-13	    B _start
-14
-15	_start:
-16	    NOP @Do Nothing
-17	    MRS R0, BASEPRI
-18	    MRS R0, PRIMASK
-19	    MRS R0, FAULTMASK
-20	    MRS R0, PSR
-21	    MRS R0, CONTROL
-22	    LDR R0, ='H'
-23	    LDR R1, ='e'
-24	    LDR R2, ='l'
-25	    LDR R3, ='l'
-26	    LDR R4, ='o'
-27	    LDR R5, =' '
-28	    LDR R6, = 'W'
-29	    LDR R7, = 'o'
-30	    LDR R8, = 'r'
-31	    LDR R9, = 'l'
-32	    LDR R10, = 'd'
-33	    _endlessLoop:
-34	    NOP
-35	    B _endlessLoop
-(gdb)
-```
-
 ### Setting a Breakpoint & Running to It
 
-4. Effectively at this point our code is loaded and ready to run, let's try a couple of things before we go forward. Let's try to put a breapoint on ```_endlessLoop``` label, we do so by typing the following:
+1. Let's try a couple of things before we go forward. Let's try to put a breakpoint on ```line 35```, we do so by typing the following:
 
 ```bash
-(gdb) b _endlessLoop
-Breakpoint 2 at 0x24c: file src/startup.s, line 34.
+(gdb) b 35
+Breakpoint 2 at 0x25c: file ./src/startup.s, line 35.
 ```
+![make-debug-qemu](./img/make-debug-qemu-01.png)
+
 
 As you can see the debugger has now placed a break on line 34. The info message shows us the following:
 - ```Breakpoint 2``` - This breakpoint is now associated with number 2, as in the second breakpoint.
-- ```at 0x24c``` - The location of the PC (Program Counter) for that specific code line
+- ```at 0x25c``` - The location of the PC (Program Counter) for that specific code line
 - ```file src/startup.s ``` - The file for which this breakpoint corresponds to
-- ``` line 34 ``` - The line in ```src/startup.s``` which this breakpoint corresponds to.
+- ``` line 35 ``` - The line in ```src/startup.s``` which this breakpoint corresponds to.
 
-5. Let's examine the values of our registers before we run the program, we do so by typing the following:
-```
-(gdb) info registers
-r0             0x0                 0
-r1             0x0                 0
-r2             0x0                 0
-r3             0x0                 0
-r4             0x0                 0
-r5             0x0                 0
-r6             0x0                 0
-r7             0x0                 0
-r8             0x0                 0
-r9             0x0                 0
-r10            0x0                 0
-r11            0x0                 0
-r12            0x0                 0
-sp             0x20000400          0x20000400
-lr             0xffffffff          -1
-pc             0x208               0x208 <resetHandler>
-xpsr           0x41000000          1090519040
-fpscr          0x0                 0
-```
-As you can see Registers R0 to R12 are zero'ed out.
+If you look at the top pane where the registers values are printed out you will see that Registers R0 to R12 are zero'ed out.
 
 
-6. Now let's run the code until breakpoint #2 is hit. We do so by typing the following on the gdb prompt:
+2. Now let's run the code until breakpoint #2 is hit. We do so by typing the following on the gdb prompt:
 ```bash
 (gdb) c
 Continuing.
 
-Breakpoint 1, _start () at src/startup.s:16
-16	    NOP @Do Nothing
+Breakpoint 1, _start () at ./src/startup.s:16
+```
+As you can see we stoped at line 16, righat the ```NOP @Do Nothing``` instruction, now lets press `c` to continue again.
+```bash
 (gdb) c
 Continuing.
 
-Breakpoint 2, _endlessLoop () at src/startup.s:34
-34	    B _endlessLoop
+Breakpoint 2, _start () at ./src/startup.s:35
 ```
-You'll see from the above we had to hit 'c' twice to get us to the second breakpoint.
 
-6. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched before it goes into an endless loop. So let's examine the registers to see if they are the right values after execution and before hiting the endlessLoop section. We do so by typing the following:
+3. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched. So let's examine the registers to see if they are the right values after execution and before hiting the endlessLoop section. As you can see GDB has highligted all the values that changed since the first breakpoint was hit.
 
-```bash
-(gdb) info registers
-r0             0x48                72
-r1             0x65                101
-r2             0x6c                108
-r3             0x6c                108
-r4             0x6f                111
-r5             0x20                32
-r6             0x57                87
-r7             0x6f                111
-r8             0x72                114
-r9             0x6c                108
-r10            0x64                100
-r11            0x0                 0
-r12            0x0                 0
-sp             0x20000400          0x20000400
-lr             0xffffffff          -1
-pc             0x24e               0x24e <_endlessLoop+2>
-xpsr           0x41000000          1090519040
-fpscr          0x0                 0
-(gdb)
-```
+![make-debug-qemu](./img/make-debug-qemu-02.png)
 
 If you look carefull you will see that:
 ```bash
@@ -344,36 +262,8 @@ R9 == 0x6c == 'l'
 R10== 0x64 == 'd'
 ```
 
-### Quiting QEMU & Cleaning Up
-7. Now that we have run our first example the next step is to quit GDB properly and clean up a bit after ourselves. On the gdb prompt type quit and press enter, when prompted press 'y' to quit.
-```
-A debugging session is active.
-
-	Inferior 1 [process 1] will be detached.
-
-Quit anyway? (y or n) y
-Detaching from program: /home/spanou/development/baremetal-super-minimal/startup.elf, process 1
-Ending remote debugging.
-[Inferior 1 (process 1) detached]
-```
-At this point our debugger has been detached but our QEMU model is still running. Now lets terminate QEMU by typing the following:
-```
-spanou@qemu-m4:~/development/c/test/baremetal-super-minimal$ ps -a
-  PID TTY          TIME CMD
-   39 pts/0    00:00:59 qemu-system-arm
-   44 pts/0    00:00:00 ps
-```
-
-This command gives us the Process ID for QEMU, in this example it is 39. In your example this number might/will be different, make sure you select the process ID (PID) number corresponding to your ```qemu-system-arm``` executable. We are now goign to kill that process:
-
-```
-spanou@qemu-m4:~/development/baremetal-super-minimal$ kill -9 39
-spanou@qemu-m4:~/development/baremetal-super-minimal$ ps -a
-  PID TTY          TIME CMD
-   45 pts/0    00:00:00 ps
-spanou@qemu-m4:~/development/baremetal-super-minimal$
-```
-As you can see after the ```kill -9 30``` if we examine the running processes again, ```qemu-system-arm``` is not longer there!
+### Quiting QEMU
+1. This is a simple step, just press q at the GDB prompt and then follow the instructions.
 
 ## Next Steps
 
