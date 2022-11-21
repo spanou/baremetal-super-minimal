@@ -34,6 +34,54 @@
 @			   Use gdb to view the contents of the MEMORY_MONITOR before and after
 @			   calling each function. x/128bc
 @
+.text
+.global DEBUG_STR
+.type DEBUG_STR, %object
+DEBUG_STR:
+.asciz "Hello Cruel World !\n"
+.align 4
 
+.global MEMORY_MONITOR_SZ
+MEMORY_MONITOR_SZ =100
 
-@ <add your code here>
+.section .bss
+.align 4
+.global MEMORY_MONITOR
+.type MEMORY_MONITOR, %object
+MEMORY_MONITOR:
+.space 100
+.align 4
+
+.text 
+.global clearMemoryMonitorAsm
+.type clearMemoryMonitorAsm, %function
+clearMemoryMonitorAsm:@ R0(regionAddress), R1(regionSize)
+	LDR R3, =0
+	CMP R1, #0
+	BEQ _done
+	STR R3, [R0, R1]
+	SUB R1, #1
+	B clearMemoryMonitorAsm
+_done:
+	BX LR
+
+.global strCopyAsm
+.type strCopyAsm, %function
+strCopyAsm: @ R0(src), R1(dst)
+    copyStringLoop:
+        @ Load a byte from the string greetings (pointed to by R0) into R2
+        LDRB R2, [R0]
+        @ Compare the character for 0
+        CMP R2, #0
+        @ If 0 means we reached the end of the string drop to the exit
+        BEQ copyStringExit
+        @ Copy the greetings character to the Memory Monitor
+        STRB R2, [R1]
+        @ Increment both the source(R0) and destination(R1) pointers
+        ADD R0, R0, #1
+        ADD R1, R1, #1
+        B copyStringLoop
+    copyStringExit:
+        BX LR
+
+.end

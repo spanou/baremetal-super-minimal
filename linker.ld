@@ -1,4 +1,4 @@
-/* 
+/*
  * Check Notes for memory map (../docs/NOTES.md)
  */
 

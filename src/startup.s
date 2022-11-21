@@ -30,10 +30,10 @@ _start:
     LDR R8, = 'r'
     LDR R9, = 'l'
     LDR R10, = 'd'
-    
+
     @ Zeroize the BSS segment
     BL initBss
-    
+
     @ Call in the startMain
     BL startMain
 

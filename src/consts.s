@@ -19,3 +19,5 @@
 	.error "Unrecognized Platform Selected"
 
 .endif
+
+.end

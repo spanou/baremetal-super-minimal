@@ -10,3 +10,5 @@
 .word _stackEnd
 .word resetHandler
 .space 0x200
+
+.end

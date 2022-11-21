@@ -141,7 +141,7 @@ ifeq ($(BOARD), qemu)
 else ifeq ($(BOARD), sam4)
 	$(ECHO) "Open a new terminal on your host and type: openocd -f ./scripts/openofc.cfg"
 	$(GDB) $(GDB_PRE_INIT) $(GDB_POST_INIT) $(TARGET_ELF)
-endif 
+endif
 
 
 .PHONY: all
