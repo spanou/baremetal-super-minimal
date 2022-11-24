@@ -6,12 +6,21 @@
 .thumb
 
 
+@
+@ Local variables for this module
+@
+.data
+sysTickCount: .word 0x00000000
+endlessLoopCount: .word 0x00000000
+.align 4
+
+
 .text
 .global resetHandler
-
 .type resetHandler, %function
 resetHandler:
     B _start
+
 
 _start:
     NOP @Do Nothing
@@ -35,17 +44,23 @@ _start:
     @ Zeroize the BSS segment
     BL initBss
 
-    @ Setup SysTick
-    BL setupSysTick
-
     @ Call in the startMain
     BL startMain
 
-    @ Spin Around endlessly
-    LDR R0, =SYST_CVR
+    @ Setup SysTick
+    BL setupSysTick
+
+    @ Increment the endlessLoopCount
+    @ variable for ever. We don't care
+    @ about rounding over the variable
 _endlessLoop:
+    LDR R0, =endlessLoopCount
+    LDR R1, =0
     LDR R1, [R0]
+    ADD R1, #1
+    STR R1, [R0]
     B _endlessLoop
+
 
 .type initBss, %function
 initBss:
@@ -63,7 +78,7 @@ _zeroBssLoop:
 
 .type setupSysTick, %function
 setupSysTick:
-    PUSH {R0-R2, LR}
+    PUSH {R0-R2}
     LDR R0, =SYST_CSR
     LDR R1, =SYST_CSR_CLKS   @ Set CLKSOURCE to 1 = SysTick Processor Clock
     LDR R2, [R0]
@@ -76,7 +91,7 @@ setupSysTick:
     ORR R2, R1
     STR R2, [R0]
 
-    LDR R0, =SYST_RVR      @ Setup the Reload register to reload from 10000
+    LDR R0, =SYST_RVR      @ Setup the Reload register
     LDR R1, =SYST_RELOAD_VAL
     STR R1, [R0]
 
@@ -86,13 +101,28 @@ setupSysTick:
     ORR R2, R1
     STR R2, [R0]
 
-    POP {R0-R2, LR}
+    POP {R0-R2}
     BX LR
 
+
+.text
 .global sysTickHandler
 .type sysTickHandler, %function
 sysTickHandler:
-    NOP
-    B sysTickHandler
+    @ Increment the sysTickCount
+    LDR R1, =sysTickCount
+    LDR R0, [R1]
+    ADD R0, #1
+    STR R0, [R1]
+
+    @ Clear the current value to
+    @ clear reload the CVR with the RVR
+    @ and clear the COUNTFLAG
+    LDR R1, =SYST_CVR
+    LDR R0,=0
+    STR R0, [R1]
+
+    @ Return and run
+    BX LR
 
 .end

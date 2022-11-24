@@ -141,7 +141,7 @@ setISR sysTickHandler
 .type defaultISR, %function
 .global defaultISR
 defaultISR:
-    NOP
+    BKPT
     B defaultISR
 
 .end
