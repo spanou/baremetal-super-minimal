@@ -135,8 +135,9 @@ The full manuals for all the binutils can be found [here](https://manpages.debia
 ## Docker
 <TODO>
 
-## Documents
-<TODO>
-
 ## Additional Resources
+### Documents
 <TODO>
+	
+## Tutorials
+Please access the tutorials [here](./tutorials.md).
