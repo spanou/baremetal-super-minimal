@@ -266,4 +266,4 @@ R10== 0x64 == 'd'
 
 ## Next Steps
 
-Although not a terribly exciting example, a lot has happened behind the scenes to get us even to this point, don't worry if you don't understand everything just yet. The point of this Getting Started guide is to ensure everything works on your setup and to expose you to some very basic concepts. We will cover everything in detail in [Tutorial #1](./tutorial-01.md).
+Although not a terribly exciting example, a lot has happened behind the scenes to get us even to this point, don't worry if you don't understand everything just yet. The point of this Getting Started guide is to ensure everything works on your setup and to expose you to some very basic concepts. We will cover everything in detail in [The Basics](./the-basics.md).
