@@ -21,7 +21,7 @@ Let's keep this simple with the following 3 simple steps:
 2. [Clone & Build the Code](./docs/getting-started.md#step-2---clone--build-the-code)
 3. [Load, Run & Debug](./docs/getting-started.md#step-3---load-debug--run-the-code)
 
-Once we have you up and running we will go through a series of indepth [tutorials]() to help build your knowledge.
+Once we have you up and running we will go through a series of indepth [tutorials](./docs/tutorials.md) to help build your knowledge.
 
 ## Getting More Info
 
