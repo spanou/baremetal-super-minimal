@@ -21,7 +21,7 @@ Let's keep this simple with the following 3 simple steps:
 2. [Clone & Build the Code](./docs/getting-started.md#step-2---clone--build-the-code)
 3. [Load, Run & Debug](./docs/getting-started.md#step-3---load-debug--run-the-code)
 
-Once we have you up and running we will go through a series of in-depth [tutorials](./docs/tutorials.md) to help build your knowledge.
+Once we have you up and running we will go through a series of in-depth tutorials to help build your knowledge. That being said, even for the very simple example we have going there is a lot that has happened already, so let's get start with [The Basics](./docs/the-basics.md) before we jump on the first tutorial.
 
 ## Getting More Info
 
