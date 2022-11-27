@@ -29,7 +29,13 @@ All documentation resides in the ```docs/``` folder located at the root of the p
 
 ## Can I Contribute?
 
-Absolutely yes! Fork the project, make your changes, test them, send me a pull request. We'll streamline the contribution process a bit further down the line. For now, we are keeping things very simple. I would encourage you to keep in mind that the goal of this project is for people to learn, that means at times, we may not choose the best possible implementation, but one that helps share knowledge most efficiently. As our audience matures through the tutorials, we can start to introduce more optimal ways of doing things. 
+Absolutely yes!
+
+Fork the project, make your changes, test them, send me a pull request. 
+
+We'll streamline the contribution process a bit further down the line. For now, we are keeping things very simple. 
+
+I would encourage you to keep in mind that the goal of this project is for people to learn, that means at times, we may not choose the best possible implementation, but one that helps share knowledge most efficiently. As our audience's knowledge matures through the tutorials, we can start to introduce more optimal ways of doing things. 
 
 >**Note:** every submission must be licensed under the BSD-3 license model.
 
