@@ -10,7 +10,7 @@
 
 # Introduction
 
-**Baremetal Super Minimal** is a project that enables you to learn embedded programming on the popular ARM Cortex M cores from the ground up. All the tools we will use are completely open source and at no cost _(you don't need a board to get started)_. We are committing to using Open Source tools only, thereby avoiding any dependencies on vendor tools.
+**Baremetal Super Minimal** is a project that enables you to learn embedded programming on the popular ARM Cortex M cores from the ground up. All the tools we will use are completely open source and at no cost _(you don't even need a board to get started)_. We are committing to using Open Source tools only, thereby avoiding any dependencies on vendor tools.
 
 
 ## Next Steps
@@ -21,7 +21,7 @@ Let's keep this simple with the following 3 simple steps:
 2. [Clone & Build the Code](./docs/getting-started.md#step-2---clone--build-the-code)
 3. [Load, Run & Debug](./docs/getting-started.md#step-3---load-debug--run-the-code)
 
-Once we have you up and running we will go through a series of indepth [tutorials](./docs/tutorials.md) to help build your knowledge.
+Once we have you up and running we will go through a series of in-depth [tutorials](./docs/tutorials.md) to help build your knowledge.
 
 ## Getting More Info
 
@@ -29,7 +29,9 @@ All documentation resides in the ```docs/``` folder located at the root of the p
 
 ## Can I Contribute?
 
-Absolutely yes! Clone the project, make your changes, create a diff and email it to [me](mailto:sakis.panou@gmail.com). We'll streamline the contribution process a bit further down the line. For now, we are keeping things very simple. Please note, every submission must be licensed under the BSD-3 license model.
+Absolutely yes! Fork the project, make your changes, test them, send me a pull request. We'll streamline the contribution process a bit further down the line. For now, we are keeping things very simple. I would encourage you to keep in mind that the goal of this project is for people to learn, that means at times, we may not choose the best possible implementation, but one that helps share knowledge most efficiently. As our audience matures through the tutorials, we can start to introduce more optimal ways of doing things. 
+
+>**Note:** every submission must be licensed under the BSD-3 license model.
 
 # Background
 
@@ -40,7 +42,7 @@ But what happens when you want to squeeze the last drop of performance? What hap
 
 The answer to these questions typically lay outside the normal flow of operation. Where you need to really know your tools. It takes time, effort, dedication and experience to build that knowledge from the ground up.
 
-For this project we are going to focus on the ARM Cortex M architecture. We will go from the very low ASM start up code setting up the MCU core to handing over control to C modules without any C Runtime support.
+For this project we are going to focus on the ARM Cortex M architecture. We will go from the very low ASM start up code setting up the MCU core to handing over control to C modules. Eventually we will introduce the C runtime support and even port a Zephyr RTOS on this project. 
 
 Going along we will touch upon all our tools and how to master their functionality.
 
