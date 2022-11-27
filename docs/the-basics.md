@@ -11,12 +11,12 @@ In our [Getting Started Example](./getting-started.md) we skipped over many thin
 			+ [Object Dumps]()
 			+ [Symbol Lists]()
 			+ [ELF Reader]()
-		- [Makefile]()
-		- [Version Control]()
-		- [Scripts]()
-		- [Docker]()
-		- [Documents]()
-		- [Additional Resources]()
+		- [Makefile](#the-makefile)
+		- [Version Control](#version-control)
+		- [Scripts](#scripts)
+		- [Docker](#docker)
+		- [Documents](#documents)
+		- [Additional Resources](#additional-resources)
 
 ## Geting to Know Your Tools
 
@@ -33,7 +33,7 @@ Let's get some basic terminology down quickly. Your **Target Machine** is the em
 
 ![Host-Target-Machines](./img/host-target-machines.png)
 
-<p style="text-align: center;">Figure 1 - Common Embedded Development Set Up</p>
+_Figure 1 - Common Embedded Development Set Up_
 
 To build code for a **Target Machine**, that is different from your **Host Machine**, it is important to install a **cross compilation toolchain**. Thankfully many of these cross compilation tool chains are prebuild and ready to install in a variety of popular Host Machine OSes _(Linux, Mac, Windows)_. Please note: the collection of those tools is commonly referred to as **binutils** _(at least in GNU parlance)_. Although there are many suppliers of cross complication toolchains, we will focus on the GNU ones. This is in keeping with making sure we use popular free open source tools.
 
@@ -68,7 +68,8 @@ Your tool chain comprises of a lot more than your compiler, linker, assembler. Y
 A typical build flow consists of the following steps, shown in _Figure 2_.
 
 ![Build Flow Image](./img/build-flow.png)
-<p style="text-align: center;">Figure 2 - Typicall Build Flow</p>
+
+_Figure 2 - Typicall Build Flow_
 
 1. **Compile Source Code**
 	+ _Pass the Sources (\*.c, \*.cc, \*.s) to the Compilers (C, C++, ASM) to generate the Object files (\*.o)_
