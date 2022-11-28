@@ -37,7 +37,7 @@ _Figure 1 - Common Embedded Development Set Up_
 
 To build code for a **Target Machine**, which is typically different from your **Host Machine**, it is important to install a **cross compilation toolchain**. Thankfully many of these cross compilation tool chains are pre-built and ready to install. They support a variety of popular Host Machine OSes _(Linux, Mac, Windows)_.
 
-> Please Note: The collection of those tools is commonly referred to as **binutils** _(at least in GNU parlance)_.
+> **Note**: The collection of those tools is commonly referred to as **binutils** _(at least in GNU parlance)_.
 
 There are many suppliers of cross complication tool chains, we will focus on the GNU ones. This is in keeping with making sure we use popular free open source tools.
 
@@ -53,7 +53,7 @@ OS      = linux,freebsd, eabi...etc
 
 To determine what your compiler tool chain supports invoke the ```arm-none-eabi-gcc``` with the ```-dumpmachine``` parameter.
 
->Please Note: At this point we expect you to have your docker container with its console/terminal available to you. If you don't recall how please look back at [Launching The Container](./getting-started.md#launching-the-container)
+> **Note**: At this point we expect you to have your docker container with its console/terminal available to you. If you don't recall how please look back at [Launching The Container](./getting-started.md#launching-the-container)
 
 ```
 spanou@qemu-m4:~/development/baremetal-super-minimal$ arm-none-eabi-gcc -dumpmachine
