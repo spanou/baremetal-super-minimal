@@ -125,19 +125,27 @@ arm-none-eabi-c++         arm-none-eabi-g++         arm-none-eabi-gcc-nm      ar
 The full manuals for all the binutils can be found [here](https://manpages.debian.org/testing/binutils-arm-none-eabi/index.html)
 
 #### ELF Files in Embedded Systems
-<TODO> Background history in ELF files, their content and how they were not designed for embedded systems.
+> TODO:
+> - Background history in ELF files
+> - Outline basic content and how they were not designed for embedded systems.
 
 ## The Makefile
-<TODO>
+> TODO:
+> - Comming Soon - Break down the current Makefile in depth.
+> - Describe rules, Variables, Function - Basics in General, use the current content to reference these concepts.
 
 ## Version Control
-<TODO>
+> TODO:
+> - Talk about git as a version management tool, its advantages and give open source resources to help.
+> - Go through some very basic commands to help starting to build familiarity.
 
 ## Scripts
-<TODO>
+> TODO:
+> - Go over the scripts we provide in our scripts folder and outline what they do.
 
 ## Docker
-<TODO>
+> TODO:
+> - show how to have mulitiple docker console windows for the same docker container. Give details
 
 ## Additional Resources
 ### Documents
