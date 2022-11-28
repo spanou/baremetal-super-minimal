@@ -18,16 +18,16 @@ In our [Getting Started Example](./getting-started.md) we skipped over many thin
 		- [Documents](#documents)
 		- [Additional Resources](#additional-resources)
 
-## Geting to Know Your Tools
+## Getting to Know Your Tools
 
-Knowning your tools makes the difference between being able to do high precision, high volume work, and aimlessly trying things at the worst possible time. Like every professional, your tools are the most valuable resource. You don't need to become an expert straight away, we will add to our knowledge in every tutorial.
+Knowing your tools makes the difference between being able to do high precision, high volume work, and trying things at the worst possible time. Like every professional, your tools are one of your most valuable resource. You don't need to become an expert straight away, we will add to our knowledge in every tutorial.
 
 In this chapter we will go over all the tools we are using, we'll dive deep where we need to, and as we go along, in every tutorial, we'll add a bit more to your knowledge.
 
 
 ### The Build Tools
 
-To build an embedded application, we need the right tools. We cannot simply use the compiler, linker etc that we use for our x86_64, our **Host Machine**. We need a set of tools that will compile and link code for the specific **Target Machine**.
+To build an embedded application, we need the right tools for the specific **Target Machine**. We cannot simply use the same tools _(complier, linker..etc)_ that we use for our x86_64 **Host Machine**. We need a set of tools that will compile and link code for the specific **Target Machine**.
 
 Let's get some basic terminology down quickly. Your **Target Machine** is the embedded system for which your code is built and run, it can be an ARM32 core, ARM64, RISC-V...etc. In contrast your **Host Machine** is the laptop/workstation/desktop that you use to build the code for your Target Machine. _Figure 1_ below shows a visual representation of a typical embedded development setup.
 
@@ -35,7 +35,11 @@ Let's get some basic terminology down quickly. Your **Target Machine** is the em
 
 _Figure 1 - Common Embedded Development Set Up_
 
-To build code for a **Target Machine**, that is different from your **Host Machine**, it is important to install a **cross compilation toolchain**. Thankfully many of these cross compilation tool chains are prebuild and ready to install in a variety of popular Host Machine OSes _(Linux, Mac, Windows)_. Please note: the collection of those tools is commonly referred to as **binutils** _(at least in GNU parlance)_. Although there are many suppliers of cross complication toolchains, we will focus on the GNU ones. This is in keeping with making sure we use popular free open source tools.
+To build code for a **Target Machine**, which is typically different from your **Host Machine**, it is important to install a **cross compilation toolchain**. Thankfully many of these cross compilation tool chains are pre-built and ready to install. They support a variety of popular Host Machine OSes _(Linux, Mac, Windows)_.
+
+> Please Note: The collection of those tools is commonly referred to as **binutils** _(at least in GNU parlance)_.
+
+There are many suppliers of cross complication tool chains, we will focus on the GNU ones. This is in keeping with making sure we use popular free open source tools.
 
 Build Tools come in many flavours for many Target Machines. The GNU build system supports the concept of a [Target Triplet](https://wiki.osdev.org/Target_Triplet). It is called a triplet because the build system name is comprised of 3 key pieces of information. Those are:
 
@@ -47,9 +51,9 @@ VENDOR  = pc, unknown, none...etc
 OS      = linux,freebsd, eabi...etc
 ```
 
-To determine what your compiler toolchain supports invoke the ```arm-none-eabi-gcc``` with the ```-dumpmachine``` parameter.
+To determine what your compiler tool chain supports invoke the ```arm-none-eabi-gcc``` with the ```-dumpmachine``` parameter.
 
->Please Note: At this point we expect you to have your docker container with its console available to you. If you don't recall how please look back at [Launching The Container](./getting-started.md#launching-the-container)
+>Please Note: At this point we expect you to have your docker container with its console/terminal available to you. If you don't recall how please look back at [Launching The Container](./getting-started.md#launching-the-container)
 
 ```
 spanou@qemu-m4:~/development/baremetal-super-minimal$ arm-none-eabi-gcc -dumpmachine
@@ -57,9 +61,9 @@ arm-none-eabi
 spanou@qemu-m4:~/development/baremetal-super-minimal$
 ```
 
-Unsurprisingly your compiler reports that your triplet is ```arm-none-eabi```. In other words we can build executables for an ARM 32 CPU, the vendor is none (independent) and the OS is the EABI which stands for [Embedded Application Binary Interface](https://en.wikipedia.org/wiki/Application_binary_interface#Embedded_ABIs).
+Unsurprisingly, your compiler reports that your triplet is ```arm-none-eabi```. In other words we can build executables for an ARM 32 MCU, the vendor is none (independent) and the OS is the EABI which stands for [Embedded Application Binary Interface](https://en.wikipedia.org/wiki/Application_binary_interface#Embedded_ABIs).
 
-In this tutorial we strongly suggest using the cross compilation toolchain that we have pre-installed in the Docker container image. Especially since our focus is on code development itself. There could be many reasons as to why you might want to control the build of your cross compilation tool chain from source. If you were building for a highly secure or safety sensitive system, you'll want to know the precise version of the tool chain, including any patches that are fixing critical issues, especially if your project needs to go through some certification. There are many ways to build your development tool chain from source, [crosstool-ng](https://crosstool-ng.github.io/), [yocto](https://www.yoctoproject.org/), or right from GCC source to mention a few. All these concepts are beyond the scope of this tutorial.
+In this tutorial we strongly suggest using the cross compilation tool chain that we have pre-installed in the Docker container image. Especially since our focus is on code development itself. There could be many reasons as to why you might want to control the build of your cross compilation tool chain from source. If you were building for a highly secure or safety sensitive system, you'll want to know the precise version of the tool chain, including any patches that are fixing critical issues. There are many ways to build your development tool chain from source, [crosstool-ng](https://crosstool-ng.github.io/), [yocto](https://www.yoctoproject.org/), or right from GCC source to mention a few. All these concepts are beyond the scope of this tutorial.
 
 Your tool chain comprises of a lot more than your compiler, linker, assembler. You need a whole collection of tools to help you when you develop for an embedded system.
 
@@ -73,7 +77,7 @@ _Figure 2 - Typicall Build Flow_
 
 1. **Compile Source Code**
 	+ _Pass the Sources (\*.c, \*.cc, \*.s) to the Compilers (C, C++, ASM) to generate the Object files (\*.o)_
-2. **Link Object Files**
+2. **Build ELF by Link Object Files**
 	+ _Pass the Object files (\*.o) to the Linker along with a linker script (\*.ld) to build the ELF file (\*.elf)_
 3. **Generate The Listing**
 	+ Pass the ELF file to the Object Dump (objdump) utility to generate a listing file (\*.lst) which contains the source code and dissably for all sources
