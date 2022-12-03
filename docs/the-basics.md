@@ -65,7 +65,7 @@ Unsurprisingly, your compiler reports that your triplet is ```arm-none-eabi```. 
 
 In this tutorial we strongly suggest using the cross compilation tool chain that we have pre-installed in the Docker container image. Especially since our focus is on code development itself. There could be many reasons as to why you might want to control the build of your cross compilation tool chain from source. If you were building for a highly secure or safety sensitive system, you'll want to know the precise version of the tool chain, including any patches that are fixing critical issues. There are many ways to build your development tool chain from source, [crosstool-ng](https://crosstool-ng.github.io/), [yocto](https://www.yoctoproject.org/), or right from GCC source to mention a few. All these concepts are beyond the scope of this tutorial.
 
-Your tool chain comprises of a lot more than your compiler, linker, assembler. You need a whole collection of tools to help you when you develop for an embedded system.
+Your tool chain is comprised of a lot more than your compiler, linker, assembler. You need a whole collection of tools to help you when you develop for an embedded system.
 
 #### Build Flow
 
