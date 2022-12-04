@@ -63,4 +63,4 @@ I don't believe installing the tools is particularly challenging or noteworthy e
 
 >**Note:** _We will still let you know where to get the tools and how to install them. We'll do that by sharing our docker build file that contains all the installation commands in great detail._
 
-Althrough we are providing an emulation platform [(QEMU) - Netduino Plus 2](https://qemu.readthedocs.io/en/latest/system/arm/stm32.html), we will still provide a physical board based build that you can run on an actual board so you can connect up your own hardware. Our current board is a discontinued SAM4 XPlained Pro. We will aim to provide support for a newer more popular low cost board to help you follow along.
+Although we are providing an emulation platform [(QEMU) - Netduino Plus 2](https://qemu.readthedocs.io/en/latest/system/arm/stm32.html), we will still provide a physical board based build that you can run on an actual board so you can connect up your own hardware. Our current board is a discontinued SAM4 XPlained Pro. We will aim to provide support for a newer more popular low cost board to help you follow along.
