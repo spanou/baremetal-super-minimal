@@ -53,13 +53,13 @@ vpath %.c $(SRC_DIRS)
 ## Set up board specific options
 ##
 ifeq ($(BOARD), qemu)
-	C_PLATFORM_FLAGS= -DPLATFORM=0
+	CPPFLAGS= -DPLATFORM=0
 	ASM_PLATFORM_FLAGS=--defsym PLATFORM=0
-	CPU_FLAGS=-mthumb -mcpu=cortex-m4
+	TARGET_ARCH=-mthumb -mcpu=cortex-m4
 else ifeq ($(BOARD), sam4)
-	C_PLATFORM_FLAGS= -DPLATFORM=1
+	CPPFLAGS= -DPLATFORM=1
 	ASM_PLATFORM_FLAGS=--defsym PLATFORM=1
-	CPU_FLAGS=-mthumb -mcpu=cortex-m4
+	TARGET_ARCH=-mthumb -mcpu=cortex-m4
 endif
 
 ##
@@ -105,7 +105,7 @@ GDB_PRE_INIT= -ix=./scripts/$(BOARD).pre.gdbinit
 GDB_POST_INIT= -x=./scripts/$(BOARD).post.gdbinit
 
 ASFLAGS= $(ASM_BUILD_FLAGS) $(INCLUDES) $(ASM_PLATFORM_FLAGS)
-CFLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CPU_FLAGS) $(CLIB_FLAGS) $(C_PLATFORM_FLAGS) -c
+CFLAGS= $(C_BUILD_FLAGS) $(INCLUDES) $(CLIB_FLAGS)
 SZFLAGS= -t -x -A --common
 
 %.h.inc: scripts/$(BOARD).csv
@@ -115,10 +115,10 @@ SZFLAGS= -t -x -A --common
 	$(PYTHON3) $(REGPARSER) --output=s $< > $@
 
 $(OBJS_DIR)/%.o: %.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $(OUTPUT_OPTION) $<
 
 $(OBJS_DIR)/%.o: %.s
-	$(AS) $(ASFLAGS) $< -o $@
+	$(AS) $(ASFLAGS) $(TARGET_ARCH) $< -o $@
 
 $(TARGET_ELF): $(AUTOGENS) $(OBJS)
 	$(LL) $(OBJS) -nostartfiles -o $@ -T linker.ld
