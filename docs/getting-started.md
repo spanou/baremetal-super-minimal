@@ -234,7 +234,7 @@ Continuing.
 
 Breakpoint 1, _start () at ./src/startup.s:16
 ```
-As you can see we stoped at line 16, righat the ```NOP @Do Nothing``` instruction, now lets press `c` to continue again.
+As you can see we stoped at line 16, right at the ```NOP @Do Nothing``` instruction, now lets press `c` to continue again.
 ```bash
 (gdb) c
 Continuing.
@@ -242,7 +242,7 @@ Continuing.
 Breakpoint 2, _start () at ./src/startup.s:35
 ```
 
-3. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched. So let's examine the registers to see if they are the right values after execution. As you can see GDB has highligted all the values that changed since the first breakpoint was hit.
+3. The startup.s application does something very simple, it loads the character string 'Hello World' in the R0 to R10 registers, leaving R11, and R12 untouched. So let's examine the registers to see if they are the right values after execution. As you can see GDB has highlighted all the values that changed since the first breakpoint was hit.
 
 ![make-debug-qemu](./img/make-debug-qemu-02.png)
 
