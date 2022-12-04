@@ -75,14 +75,14 @@ Let's start breaking down the ```Makefile``` line by line.
 [1]  simple.o : simple.s
 [2] 	arm-none-eabi-as -g -mthumb -mcpu=cortex-m4 $< -o $@
 ```
-Line [1] says, to build a simple.o, the object file of simple.c, I need to run the command on line [2] _(we'll examine line [2] more indepth in a second)_. In the ```make``` nomenclature, in the statement ```simple.o : simple.c``` simple.o is the **target** and simple.c is the **dependency**. The format that every **rule** follows is: 
+Line [1] says, to build a simple.o, a simple.s is needed, to produce a simple.o I need to run the command on line [2] _(we'll examine line [2] more indepth in a second)_. In the ```make``` nomenclature, in the statement ```simple.o : simple.s``` simple.o is the **target** and simple.s is the **dependency**. The format that every **rule** follows is: 
 
 ```
     target: dependencies ...
             commands
             ...
 ```
-Line [2] outlines what command needs to be executed to generate **simple.o** from a **simple.c**. The command itself is calling the assembler ```arm-none-eabi-as``` with the options ```-g``` to generate debug symbols, ```-mthumb``` to indicate we want to generate code for the ARM thumb instruction set, and ```-mpu=cortex-m4``` specifies that we want to generate code for the specific cortex M core. ```$<``` is a build in make variable to matches the name of the dependency, in this case **simple.c**. ```-o``` specifies that the output of the assembler should be an object file named **simple.o** as is specified by the build in make variable ```$@``` that matches the **target** in this case, **simple.o**. 
+Line [2] outlines what command needs to be executed to generate **simple.o** from a **simple.c**. The command itself is calling the assembler ```arm-none-eabi-as``` with the options ```-g``` to generate debug symbols, ```-mthumb``` to indicate we want to generate code for the ARM thumb instruction set, and ```-mpu=cortex-m4``` specifies that we want to generate code for the specific cortex M core. The ```$<``` is a build in make variable to match the name of the dependency, in this case **simple.s**. The ```-o``` specifies that the output of the assembler should be an object file named **simple.o** as is specified by the build in make variable ```$@``` **target**. 
 
 ```make
 [4]  simple.elf: simple.o
@@ -90,7 +90,7 @@ Line [2] outlines what command needs to be executed to generate **simple.o** fro
 ```
 
 
-Taking a step back, line [1] and [2] are effectively telling make what commands to invoke in order to build a **simple.o** from a **simple.s**. This is a key step in building our executable. However, that in itself is not enough. In order to build an executable we need to convert the object file **simple.o** into an ```*.elf``` file. As you can tell lines [4] and [5] are "telling" make what commands to invoke in order to build a **simple.elf** from a **simple.o**. Just like previously, in make parlance, **simple.elf** is the target, while now **simple.o** is the dependency.
+Taking a step back, line [1] and [2] are effectively telling make what commands to invoke in order to build a **simple.o** from a **simple.s**. This is a key step in building our executable. However, that in itself is not enough. In order to build an executable we need to convert the object file **simple.o** into an ```*.elf```. As you can tell lines [4] and [5] are "telling" make what command(s) to invoke in order to build a **simple.elf** from a **simple.o**. Just like previously, in make parlance, **simple.elf** is the target, while now **simple.o** is the dependency.
 
 So as you can see the order of dependency is:
 ```
