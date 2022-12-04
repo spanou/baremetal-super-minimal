@@ -38,6 +38,7 @@ Before being able to use our docker image we are assuming the following prerequi
 ```bash
 docker run -it --rm --privileged --name qemu-m4 --hostname=qemu-m4 --mount type=bind,source="$HOME"/development,target=/home/spanou/development spanou/qemu-m4:latest
 ```
+> **Note**: The very first time you run this command you are likely to get a message such as ```Unable to find image 'spanou/qemu-m4:latest' locally```, this is expected. Docker will first try to find the image _spanou/qemu-m4:latest_ in your local disk. Since it wont be there, docker will then go on hub.docker.com, it will pull the image from [https://hub.docker.com/r/spanou/qemu-m4](https://hub.docker.com/r/spanou/qemu-m4) and will copy it on your local disk. This will only happen once, and it make take a few minutes.
 
 ### Testing The Container Setup
 
