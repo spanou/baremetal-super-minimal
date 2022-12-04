@@ -130,9 +130,7 @@ The full manuals for all the binutils can be found [here](https://manpages.debia
 > - Outline basic content and how they were not designed for embedded systems.
 
 ## The Makefile
-> TODO:
-> - Comming Soon - Break down the current Makefile in depth.
-> - Describe rules, Variables, Function - Basics in General, use the current content to reference these concepts.
+```make``` is one of the most highly utilized tools, we have prepared an indepth step by step tutorial [here](./makefile-tutorial.md).
 
 ## Version Control
 > TODO:
