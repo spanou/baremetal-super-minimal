@@ -13,25 +13,29 @@
 
 ## What is Make
 
-[make](https://www.gnu.org/software/make/) is an open source tool that controls the generation of executables, and other non executable files, it does so through a configuration file called Makefile. The make tool is released and managed by the [GNU project](https://gnu.org/). 
+[make](https://www.gnu.org/software/make/) is an open source tool that controls the generation of executables, and other non executable files, it does by passing a script called Makefile. The make tool is released and managed by the [GNU project](https://gnu.org/). 
 
-By itself ```make``` is not particularly useuful, it needs a configuration file as an input, typically named ```Makefile```. By default ```make``` will look for a ```Makefile``` in the current directory. If you name your makefile into something different, which is perfectly ok, you need to call ```make``` with the ```-f``` flag and the make of the makefile. For instance: 
+By itself ```make``` is not particularly useuful, it needs a project specific script as an input, typically named ```Makefile```. Makefiles are project specific, and are essentially an expression of a dependency build graph. By default ```make``` will look for a file called ```Makefile``` in the current directory. If you name your makefile into something different, say ```my-project.mk``` you need to call ```make``` with the ```-f``` flag. For instance: 
 
 
 ```bash
-make -f project.mk
+make -f my-project.mk
 ```
 
-The Makefile is something a developer writes, think of it as a collection of rules and dependencies that specify how a target application should be compiled and linked into an executable.
+The Makefile is a script that you, as a developer need to write. Think of a makefile as a collection of rules and dependencies that specify how a target application should be compiled and linked into an executable. If you recall from [The Basics - Build Flow ](./the-basics.md#build-flow) section, we had a build flow diagram with various inputs and outputs. A Makefile script, is in essence a textual representation of that diagram, but far more flexible and powerful. 
 
 
 ### The Simplest Makefile Ever
 
+The best way to learn something is to actually do it. Before we can write the Makefile we'll need a source file to compile.
+
 Let's start with a very simple assembly file, called ```simple.s```. We will create a Makefile to compile and link the file into an executable. 
 
-simple.s
-----
+Both the ```simple.s``` assembly file and the ```Makefile``` can be found under the ```baremetal-super-minimal/docs/makefile-tutorial-files/```.
 
+#### simple.s
+----
+To access the source code for ```simple.s``` please click here [here](./makefile-tutorial-files/simple.s)
 ```asm
 [ 1]  @
 [ 2]  @ Start Up Assembler to Learn GCC ASM for ARM M4
@@ -60,6 +64,7 @@ Now let's create a simple ```Makefile``` that will build an executable called si
 
 Makefile
 ---
+To access the source code for ```Makefile``` please click here [here](./makefile-tutorial-files/Makefile)
 ```make
 [1]  simple.o : simple.s
 [2] 	arm-none-eabi-as -g -mthumb -mcpu=cortex-m4 $< -o $@
@@ -75,7 +80,7 @@ Let's start breaking down the ```Makefile``` line by line.
 [1]  simple.o : simple.s
 [2] 	arm-none-eabi-as -g -mthumb -mcpu=cortex-m4 $< -o $@
 ```
-Line [1] says, to build a simple.o, a simple.s is needed, to produce a simple.o I need to run the command on line [2] _(we'll examine line [2] more indepth in a second)_. In the ```make``` nomenclature, in the statement ```simple.o : simple.s``` simple.o is the **target** and simple.s is the **dependency**. The format that every **rule** follows is: 
+Line [1] says, to build a simple.o, a simple.s is needed. However, to produce a simple.o I need to run the command on line [2] _(we'll examine line [2] more in-depth in a second)_. In ```make``` nomenclature, the statement ```simple.o : simple.s``` simple.o is the **target** and simple.s is the **dependency**. The format that every **rule** follows is: 
 
 ```
     target: dependencies ...
@@ -90,13 +95,13 @@ Line [2] outlines what command needs to be executed to generate **simple.o** fro
 ```
 
 
-Taking a step back, line [1] and [2] are effectively telling make what commands to invoke in order to build a **simple.o** from a **simple.s**. This is a key step in building our executable. However, that in itself is not enough. In order to build an executable we need to convert the object file **simple.o** into an ```*.elf```. As you can tell lines [4] and [5] are "telling" make what command(s) to invoke in order to build a **simple.elf** from a **simple.o**. Just like previously, in make parlance, **simple.elf** is the target, while now **simple.o** is the dependency.
+Taking a step back, line [1] and [2] are effectively telling make what commands to invoke in order to build a **simple.o** from a **simple.s**. This is a key step in building our executable. However, that in itself is not enough. In order to build an executable, we need to convert the object file **simple.o** into an ```*.elf```. As you can guess, lines [4] and [5] are "telling" make what command(s) to invoke in order to build a **simple.elf** from a **simple.o**. Just like previously, in make parlance, **simple.elf** is the target, while now **simple.o** is the dependency.
 
 So as you can see the order of dependency is:
 ```
 simple.elf --> depends on simple.o --> which in turn depends on simple.s.
 ```
-Line [5] outlines that in order to build an **simple.elf** we need to invoke the linker (arm-none-eabi-ld) passing in the **simple.o**, with the option ```-o``` to specify the output file with the name ```simple.elf``` as given by the build in make variable ```$@``` that matches the **target** in this case ```simple.elf```. The ```-Ttext=0x00000000``` is an instruction to the linker to force the ```.text``` region to start at location 0x00000000, which is the start of flash for the Netduinio Plus 2. We'll see the significance of this further on.
+Line [5] outlines that in order to build an **simple.elf**, we need to invoke the linker (arm-none-eabi-ld) passing in the **simple.o**, with the option ```-o``` to specify the output file with the name ```simple.elf``` as given by the build in make variable ```$@```, that matches the **target**, in this case ```simple.elf```. The ```-Ttext=0x00000000``` is an instruction to the linker to force the ```.text``` region to start at location 0x00000000, which is the start of flash for the Netduinio Plus 2. We'll see the significance of this further on.
 
 #### Building the Application
 To build the application we will call make with the required target from the command line, like so: 
