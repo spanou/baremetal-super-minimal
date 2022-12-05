@@ -8,6 +8,8 @@
         + [Generating the Symbols and Listings](#generating-the-symbols-and-listings)
         + [Phony Targets](#phony-targets)
         + [Summary](#summary)
+    + [Example: The Variables]()
+    + [Example: The Rules]()
     + [Further Reading](#further-reading)
 
 
