@@ -359,6 +359,270 @@ arm-none-eabi-objdump -h -S simple.elf > simple.lst
 #### Summary
 As we have seen, make is a very useful tool, it is used widely in our industry and it is still one of the tools that most of us have come to rely upon. The basic concept is the ability to define a set of inter-dependencies in a Makefile in order to produce your desired output. That's pretty much the core concept, naturally we have omitted a whole bunch of seriously cool, tips and tricks. We have barely scratched the surface. Over the next section we will take our main Makefile and we'll break it down to show you some cool enhancements that will make your life a whole lot easier.
 
+## Make Variables
+
+```make``` like any other scripting language features the concept of variables. The introduction of variables simplifies the structure of a Makefile, it makes it far more maintainable and extensible. Let's start with the very basics. We will be modifying our previous makefile. 
+
+```make
+[ 1]  GNU_PREFIX = arm-none-eabi
+[ 2]  AS = $(GNU_PREFIX)-as
+[ 3]  
+[ 4]  simple.o : simple.s
+[ 5]  	arm-none-eabi-as -g -mthumb -mcpu=cortex-m4 $< -o $@
+[ 6]  
+[ 7]  simple.elf : simple.o 
+[ 8]  	arm-none-eabi-ld simple.o  -o $@ -Ttext=0x00000000
+[ 9]  
+[10]  simple.bin : simple.elf
+[11]  	arm-none-eabi-objcopy -O binary simple.elf simple.bin
+[12]  
+[13]  simple.sym : simple.elf 
+[14]  	arm-none-eabi-nm -l -n simple.elf > simple.sym
+[15]  
+[16]  simple.lst : simple.elf
+[17]  	arm-none-eabi-objdump -h -S simple.elf > simple.lst
+[18]  
+[19]  .PHONY: all 
+[20]  all: simple.bin simple.sym simple.lst
+[21]  
+[22]  .PHONY: clean
+[23]  clean:
+[24]  	rm simple.elf
+[25]  	rm simple.o
+[26]  	rm simple.bin
+[27]  	rm simple.sym
+[28]  	rm simple.lst
+[29]  
+[30]  .PHONY: print-vars
+[31]  print-vars: 
+[32]  	@echo "GNU_PREFIX = $(GNU_PREFIX)"
+[33]  	@echo "AS = $(AS)"
+```
+
+Line [ 1] we are introducing the first variable called ```GNU_PREFIX```, we set the variable to hold the string ```arm-none-eabi```, for the GNU Prefix for our toolchain. By convention all variables in Makefile should be made upper case, words should be split using underscores. There is nothing stopping  you from declaring variables in lower case letters, or even a combination, however, for readability and consistency most Makefile authors declare the variables in upper-case only. 
+
+On line [ 2] we are the creating a new variable called ```AS```. This new variable will be formed by expanding the variable ```$(GNU_PREFIX)``` followed immediately by the ```-as``` to set the value of ```AS```, effectively making the string ```arm-none-eabi-as```.
+
+The rest of our Makefile remains unchanged with the exception of lines [30] - [33], where we are introducing the ```.PHONY``` target ```print-vars```, where we using the ```echo``` command to expand and print the value held by the variables ```GNU_PREFIX``` and ```AS``` respectively. 
+
+>Note: Notice the ```@``` symbol in front of the ```echo``` command, this instructs ```make``` to not print the statement itself, it will only print the content of the string within the double quotes.
+
+### Using Variables To Simplify our Makefile
+
+It follows that we can now replace any call to the arm-none-eabi-gcc compiler through our variable ```$(AS)```, let's go ahead and do that, also create a few more variables for the rest of the GNU tool chain commands. 
+
+```make
+[ 1]  GNU_PREFIX = arm-none-eabi
+[ 2]  AS = $(GNU_PREFIX)-as
+[ 3]  LL = $(GNU_PREFIX)-ld
+[ 4]  OBJCOPY = $(GNU_PREFIX)-objcopy
+[ 5]  NM = $(GNU_PREFIX)-nm
+[ 6]  OBJDUMP = $(GNU_PREFIX)-objdump
+[ 7]  
+[ 8]  simple.o : simple.s
+[ 9]  	$(AS) -g -mthumb -mcpu=cortex-m4 $< -o $@
+[10]  
+[11]  simple.elf : simple.o
+[12]  	$(LL) simple.o  -o $@ -Ttext=0x00000000
+[13]  
+[14]  simple.bin : simple.elf
+[15]  	$(OBJCOPY) -O binary simple.elf simple.bin
+[16]  
+[17]  simple.sym : simple.elf
+[18]  	$(NM) -l -n simple.elf > simple.sym
+[19]  
+[20]  simple.lst : simple.elf
+[21]  	$(OBJDUMP) -h -S simple.elf > simple.lst
+[22]  
+[23]  .PHONY: all
+[24]  all: simple.bin simple.sym simple.lst
+[25]  
+[26]  .PHONY: clean
+[27]  clean:
+[28]  	rm simple.elf
+[29]  	rm simple.o
+[30]  	rm simple.bin
+[31]  	rm simple.sym
+[32]  	rm simple.lst
+[33]  
+[34]  .PHONY: print-vars
+[35]  print-vars:
+[36]  	@echo "GNU_PREFIX = $(GNU_PREFIX)"
+[37]  	@echo "CC = $(CC)"
+[38]  	@echo "LL = $(LL)"
+[39]  	@echo "OBJCOPY = $(OBJCOPY)"
+[40]  	@echo "OBJDUMP = $(OBJDUMP)"
+[41]  	@echo "NM = $(NM)"
+[42]    @echo "AS = $(AS)"
+```
+In this updated version of our Makefile, all GNU commands have been replaced by variables that expand to the same commands. You maybe wondering, why is this particularly useful? The exact same Makefile can be used to compile the exact same source code using a completely different toolchain, you can do that by changing a single line, line [ 1]. On line [ 9] we have the ```-mcpu=cortex-m4```option, which is very specific to this project. We could take the flags we pass to the GNU Assembler and store them in a variable, we can then go ahead and invoke the same rule but now with a variable, lets call that variable ASFLAGS. So now if we needed to change flags for our particular core we can do so again in one line. 
+
+You can already see how easy it will be to maintain the Makefile by simply using variables. We have a long way to go to make this Makefile completely re-usable and maintainable. 
+
+### Default Variables
+
+```make``` comes with a set of default variables to ensure the developer only needs to write the minimal scripting to get the job done. From our previous Makefile, checkout line ```[37] @echo "CC = $(CC)"``` we are clearly not setting a value for that variable anywhere in our Makefile. However, if you run the ```make print-vars``` you will see the following: 
+
+```bash
+GNU_PREFIX = arm-none-eabi
+CC = cc
+LL = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
+NM = arm-none-eabi-nm
+AS = arm-none-eabi-as
+```
+
+
+Where did ```$(CC)``` got the value of ```cc``` ? In fact that is ```cc```. Type the following in your command line and let's see the output:
+
+```bash
+spanou@qemu-m4:~$ which cc
+/usr/bin/cc
+
+spanou@qemu-m4:~$ ls -alh /usr/bin/cc
+lrwxrwxrwx 1 root root 20 Oct  9 21:00 /usr/bin/cc -> /etc/alternatives/cc
+
+spanou@qemu-m4:~$ ls -ahl /etc/alternatives/cc
+lrwxrwxrwx 1 root root 12 Oct  9 21:00 /etc/alternatives/cc -> /usr/bin/gcc
+
+spanou@qemu-m4:~$ ls -alh /usr/bin/gcc
+lrwxrwxrwx 1 root root 5 Feb 25  2019 /usr/bin/gcc -> gcc-8
+
+spanou@qemu-m4:~$ which gcc-8
+/usr/bin/gcc-8
+```
+
+Well, it turns out that ``cc``` is link to ```/usr/bin/cc``` which in turn it is a link to ```/etc/alternatives/cc``` which itself is a link to ```/usr/bin/gcc```, which again itself points to  ```/usr/bin/gcc-8```. 
+
+As you can see the chain of links eventually boils down to ```cc``` being ```/usr/bin/gcc-8``` which is the default x86-64 gcc compiler for our docker container. 
+
+The question though remains, how did our Makefile got the variable CC to point to the default x86-64 compiler? As mentioned previously ```make``` always has a set of default variables, such as ```CC```. But there are many many others. To find out what default variables exist in your ```make``` call make with ```-p```. Be warned, this will produce a very long print out. Let's try to shorten this, do ```make -p | grep -n CC```, your output will look something like this:
+
+```bash
+spanou@qemu-m4:~$ make -p | grep -n CC
+make: *** No targets specified and no makefile found.  Stop.
+41:LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
+53:CC = cc
+57:CPP = $(CC) -E
+69:YACC = yacc
+83:YACC.m = $(YACC) $(YFLAGS)
+85:YACC.y = $(YACC) $(YFLAGS)
+111:LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+115:LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+117:LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+137:PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+203:COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+211:COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+243:# SCCS: could not be stat'd.
+369:	$(YACC.y) $<
+375:	$(YACC.y) $<
+401:	$(YACC.m) $<
+554:	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+556:%:: SCCS/s.%
+558:	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+832:	$(YACC.m) $<
+842:	$(YACC.y) $<
+991:	$(YACC.y) $<
+```
+
+Looking at line 53:, you can immediately see that ```CC``` is set to ```cc```. 
+
+Let's temporarily move to a directory that doesn't have a Makefile. Let's do the same but this time let's search for the ```AS``` variable. 
+
+```bash
+spanou@qemu-m4:~/development/c/baremetal-super-minimal/docs/makefile-tutorial-files$ cd $HOME
+
+spanou@qemu-m4:~$ make -p | grep -n AS
+make: *** No targets specified and no makefile found.  Stop.
+111:LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+117:LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+135:AS = as
+205:COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+209:ZEPHYR_BASE = /home/spanou/development/zephyrproject/zephyr
+215:COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+```
+
+Looking at line 135, you can see also that ```AS``` is set to ```as```, now that makes sense, the default assembler for x86-64 is also set by default. However, we have overriden this in our Makefile on line [ 2]. If we jump back into the same directory we have our Makefile and do the same you will how our Makefile has overriden the default value of ```AS``` to ```$(GNU_PREFIX)-as```
+
+```bash
+make -p | grep -n AS
+116:LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+122:LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+142:AS = $(GNU_PREFIX)-as
+214:COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+220:ZEPHYR_BASE = /home/spanou/development/zephyrproject/zephyr
+226:COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+616:	$(AS) -g -mthumb -mcpu=cortex-m4 $< -o $@
+```
+
+### Overriding variables from the command line.
+
+You have the option of overriding variables in the Makefile from the command line, let's modify our Makefile slightly to illustrate the point. 
+
+```make
+[ 1]  GNU_PREFIX ?= arm-none-eabi
+[ 2]  AS = $(GNU_PREFIX)-as
+[ 3]  LL = $(GNU_PREFIX)-ld
+[ 4]  OBJCOPY = $(GNU_PREFIX)-objcopy
+[ 5]  NM = $(GNU_PREFIX)-nm
+[ 6]  OBJDUMP = $(GNU_PREFIX)-objdump
+[ 7]  
+[ 8]  simple.o : simple.s
+[ 9]  	$(AS) -g -mthumb -mcpu=cortex-m4 $< -o $@
+[10]  
+[11]  simple.elf : simple.o
+[12]  	$(LL) simple.o  -o $@ -Ttext=0x00000000
+[13]  
+[14]  simple.bin : simple.elf
+[15]  	$(OBJCOPY) -O binary simple.elf simple.bin
+[16]  
+[17]  simple.sym : simple.elf
+[18]  	$(NM) -l -n simple.elf > simple.sym
+[19]  
+[20]  simple.lst : simple.elf
+[21]  	$(OBJDUMP) -h -S simple.elf > simple.lst
+[22]  
+[23]  .PHONY: all
+[24]  all: simple.bin simple.sym simple.lst
+[25]  
+[26]  .PHONY: clean
+[27]  clean:
+[28]  	rm simple.elf
+[29]  	rm simple.o
+[30]  	rm simple.bin
+[31]  	rm simple.sym
+[32]  	rm simple.lst
+[33]  
+[34]  .PHONY: print-vars
+[35]  print-vars:
+[36]  	@echo "GNU_PREFIX = $(GNU_PREFIX)"
+[37]  	@echo "CC = $(CC)"
+[38]  	@echo "LL = $(LL)"
+[39]  	@echo "OBJCOPY = $(OBJCOPY)"
+[40]  	@echo "OBJDUMP = $(OBJDUMP)"
+[41]  	@echo "NM = $(NM)"
+[42]    @echo "AS = $(AS)"
+```
+Note that line [ 1] has changed, from ```GNU_PREFIX = arm-none-eabi``` to ```GNU_PREFIX ?= arm-none-eabi```, there is a questionmark prefixing the assign sign. The ```?=``` effectively says, set the value of ```arm-none-eabi``` to the variable ```GNU_PREFIX``` only if it is not already set. If it is already set, keep its existing value. 
+
+So let' see how we change the value of the variable ```GNU_PREFIX``` so it has a value already before that statement on line [ 1]. Do the following: ```make GNU_PREFIX=blah print-vars```, your output should look something like: 
+
+
+```bash
+$ make GNU_PREFIX=blah print-vars
+
+GNU_PREFIX = blah
+CC = cc
+LL = blah-ld
+OBJCOPY = blah-objcopy
+OBJDUMP = blah-objdump
+NM = blah-nm
+AS = blah-as
+```
+
+As you can see the value of ```GNU_PREFIX``` has been changed to ```blah``` by invoking make, and specifying at the command line a different value for the variable ```GNU_PREFIX```. Thus all the variables that expand ```GNU_PREFIX``` they now have the value of ```blah```. This opens new methods of specializing your Makefile at build time. 
+
 
 ## Further Reading
 TBA
