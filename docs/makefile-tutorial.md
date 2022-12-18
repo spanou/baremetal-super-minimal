@@ -8,7 +8,10 @@
         + [Generating the Symbols and Listings](#generating-the-symbols-and-listings)
         + [Phony Targets](#phony-targets)
         + [Summary](#summary)
-    + [Example: The Variables]()
+    + [Make Variables](#make-variables)
+        - [Using Variables to Simplify our Makefile](#using-variables-to-simplify-our-makefile)
+        - [Default Variables](#default-variables)
+        - [Overriding Variables From The Command Line](#overriding-variables-from-the-command-line)
     + [Example: The Rules]()
     + [Further Reading](#further-reading)
 
@@ -407,7 +410,7 @@ The rest of our Makefile remains unchanged with the exception of lines [30] - [3
 
 >Note: Notice the ```@``` symbol in front of the ```echo``` command, this instructs ```make``` to not print the statement itself, it will only print the content of the string within the double quotes.
 
-### Using Variables To Simplify our Makefile
+### Using Variables To Simplify Our Makefile
 
 It follows that we can now replace any call to the arm-none-eabi-gcc compiler through our variable ```$(AS)```, let's go ahead and do that, also create a few more variables for the rest of the GNU tool chain commands. 
 
@@ -556,7 +559,7 @@ make -p | grep -n AS
 616:	$(AS) -g -mthumb -mcpu=cortex-m4 $< -o $@
 ```
 
-### Overriding variables from the command line.
+### Overriding Variables From The Command Line
 
 You have the option of overriding variables in the Makefile from the command line, let's modify our Makefile slightly to illustrate the point. 
 
