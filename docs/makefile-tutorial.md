@@ -12,7 +12,8 @@
         - [Using Variables to Simplify our Makefile](#using-variables-to-simplify-our-makefile)
         - [Default Variables](#default-variables)
         - [Overriding Variables From The Command Line](#overriding-variables-from-the-command-line)
-    + [Example: The Rules]()
+        - [Concatenating Variable Content](#concatenating-variable-content) 
+    + [Conditional Execution](#conditional-execution)
     + [Further Reading](#further-reading)
 
 
@@ -626,6 +627,106 @@ AS = blah-as
 
 As you can see the value of ```GNU_PREFIX``` has been changed to ```blah``` by invoking make, and specifying at the command line a different value for the variable ```GNU_PREFIX```. Thus all the variables that expand ```GNU_PREFIX``` they now have the value of ```blah```. This opens new methods of specializing your Makefile at build time. 
 
+### Concatenating Variable Content 
+There are times when during the flow of a Makefile you may want to add additional items at the end of a variable. Especially in Makefile where there is conditional execution _(we'll talk about conditional execution in the next section)_, you may start with a variable with a default value and append to it depending on the path of the conditional statement. To append we use the ```+=``` operator. 
+
+
+```make
+CFLAGS = -Wall 
+CFLAGS += -O0
+# The value of CFLAGS will be equal to "-Wall -O0"
+
+```
+
+We'll showcase the value of the ```+=``` operator with a more realistic example when we introduce the [Conditional Execution](#conditional-section) section.
+
+## Conditional Execution
+There are times when you need to take a different course of action depending on certain conditions. For instance when you build the ```CFLAGS``` as before but this time you want to consider if you are building the target for a release build or a debug build. At this point you need to be able to examine a variable and take a different course depending on the outcome, you need a conditional execution statement. The typical format is: 
+
+```
+conditional-directive-one
+    text-if-one-is-true
+else conditional-directive-two
+    text-if-two-is-true
+else
+    text-if-one-and-two-are-false
+endif
+
+```
+
+Let's modify our Makefile to showcase a real-life example:
+
+```make
+[ 1]  BUILD?= debug
+[ 2]  
+[ 3]  GNU_PREFIX?= arm-none-eabi
+[ 4]  AS= $(GNU_PREFIX)-as
+[ 5]  LL= $(GNU_PREFIX)-ld
+[ 6]  OBJCOPY= $(GNU_PREFIX)-objcopy
+[ 7]  NM= $(GNU_PREFIX)-nm
+[ 8]  OBJDUMP= $(GNU_PREFIX)-objdump
+[ 9]  ASFLAGS= -mthumb -mcpu=cortex-m4
+[10]  
+[11]  ifeq ($(BUILD), debug)
+[12]  	AS_BUILD_FLAGS= -g --fatal-warnings
+[13]  else ifeq ($(BUILD), release)
+[14]  	AS_BUILD_FLAGS= --fatal-warnings
+[15]  endif
+[16]  
+[17]  ASFLAGS+= $(AS_BUILD_FLAGS)
+[18]  
+[19]  simple.o : simple.s
+[20]  	$(AS) $(ASFLAGS) $< -o $@
+[21]  
+[22]  simple.elf : simple.o 
+[23]  	$(LL) simple.o  -o $@ -Ttext=0x00000000
+[24]  
+[25]  simple.bin : simple.elf
+[26]  	$(OBJCOPY) -O binary simple.elf simple.bin
+[27]  
+[28]  simple.sym : simple.elf 
+[29]  	$(NM) -l -n simple.elf > simple.sym
+[30]  
+[31]  simple.lst : simple.elf
+[32]  	$(OBJDUMP) -h -S simple.elf > simple.lst
+[33]  
+[34]  .PHONY: all 
+[35]  all: simple.bin simple.sym simple.lst
+[36]  
+[37]  .PHONY: clean
+[38]  clean:
+[39]  	rm simple.elf
+[40]  	rm simple.o
+[41]  	rm simple.bin
+[42]  	rm simple.sym
+[43]  	rm simple.lst
+[44]  
+[45]  .PHONY: print-vars
+[46]  print-vars: 
+[47]  	@echo "GNU_PREFIX = $(GNU_PREFIX)"
+[48]  	@echo "CC = $(CC)"
+[49]  	@echo "LL = $(LL)"
+[50]  	@echo "OBJCOPY = $(OBJCOPY)"
+[51]  	@echo "OBJDUMP = $(OBJDUMP)"
+[52]  	@echo "NM = $(NM)"
+[53]  	@echo "AS = $(AS)"
+[54]  	@echo "BUILD = $(BUILD)"
+[55]  	@echo "AS_BUILD_FLAGS = $(AS_BUILD_FLAGS)"
+[56]  	@echo "ASFLAGS = $(ASFLAGS)"
+```
+
+On line [ 1] we added the statement ```BUILD?= debug```. Effectively we are saying, if BUILD is not specified at the command line, or in any other call context, the the default value will be set to ```debug```. On line [11] we are invoking the ```ifeq``` statement, passing in a variable _$(BUILD)_ and a text _"debug"_. The statement will check for equality between the string stored in the variable and the literal sting, if found equal, the statement on line [12] is executed setting the new variable ```AS_BUILD_FLAGS``` to the appropriate flags for a debug build, namely ```-g``` : generate debug information and ```--fatal-warnings```: treating each warning as an error. Then on line [17] we append the value of ```AS_BUILD_FLAGS``` into ASFLAGS. Thereby changing the value of ```ASFLAGS``` based on BUILD type. 
+
+To change the default set of ```$(BUILD)``` all you need to do is to invoke make with the the target and the ```BUILD``` variable set to ```release```, like so:
+
+```bash
+$ make BUILD=release all 
+arm-none-eabi-as -mthumb -mcpu=cortex-m4 --fatal-warnings simple.s -o simple.o
+arm-none-eabi-ld simple.o  -o simple.elf -Ttext=0x00000000
+arm-none-eabi-objcopy -O binary simple.elf simple.bin
+arm-none-eabi-nm -l -n simple.elf > simple.sym
+arm-none-eabi-objdump -h -S simple.elf > simple.lst
+```
 
 ## Further Reading
 TBA

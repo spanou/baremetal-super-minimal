@@ -1,12 +1,23 @@
-GNU_PREFIX ?= arm-none-eabi
-AS = $(GNU_PREFIX)-as
-LL = $(GNU_PREFIX)-ld
-OBJCOPY = $(GNU_PREFIX)-objcopy
-NM = $(GNU_PREFIX)-nm
-OBJDUMP = $(GNU_PREFIX)-objdump
+BUILD?= debug
+
+GNU_PREFIX?= arm-none-eabi
+AS= $(GNU_PREFIX)-as
+LL= $(GNU_PREFIX)-ld
+OBJCOPY= $(GNU_PREFIX)-objcopy
+NM= $(GNU_PREFIX)-nm
+OBJDUMP= $(GNU_PREFIX)-objdump
+ASFLAGS= -mthumb -mcpu=cortex-m4
+
+ifeq ($(BUILD), debug)
+	AS_BUILD_FLAGS= -g --fatal-warnings
+else ifeq ($(BUILD), release)
+	AS_BUILD_FLAGS= --fatal-warnings
+endif
+
+ASFLAGS+= $(AS_BUILD_FLAGS)
 
 simple.o : simple.s
-	$(AS) -g -mthumb -mcpu=cortex-m4 $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 simple.elf : simple.o 
 	$(LL) simple.o  -o $@ -Ttext=0x00000000
@@ -20,7 +31,7 @@ simple.sym : simple.elf
 simple.lst : simple.elf
 	$(OBJDUMP) -h -S simple.elf > simple.lst
 
-.PHONY: all 
+.PHONY: all
 all: simple.bin simple.sym simple.lst
 
 .PHONY: clean
@@ -32,7 +43,7 @@ clean:
 	rm simple.lst
 
 .PHONY: print-vars
-print-vars: 
+print-vars:
 	@echo "GNU_PREFIX = $(GNU_PREFIX)"
 	@echo "CC = $(CC)"
 	@echo "LL = $(LL)"
@@ -40,3 +51,6 @@ print-vars:
 	@echo "OBJDUMP = $(OBJDUMP)"
 	@echo "NM = $(NM)"
 	@echo "AS = $(AS)"
+	@echo "BUILD = $(BUILD)"
+	@echo "AS_BUILD_FLAGS = $(AS_BUILD_FLAGS)"
+	@echo "ASFLAGS = $(ASFLAGS)"
