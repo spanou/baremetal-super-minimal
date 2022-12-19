@@ -638,7 +638,7 @@ CFLAGS += -O0
 
 ```
 
-We'll showcase the value of the ```+=``` operator with a more realistic example when we introduce the [Conditional Execution](#conditional-section) section.
+We'll showcase the value of the ```+=``` operator with a more realistic example when we introduce the [Conditional Execution](#conditional-execution) section.
 
 ## Conditional Execution
 There are times when you need to take a different course of action depending on certain conditions. For instance when you build the ```CFLAGS``` as before but this time you want to consider if you are building the target for a release build or a debug build. At this point you need to be able to examine a variable and take a different course depending on the outcome, you need a conditional execution statement. The typical format is: 
